@@ -384,8 +384,7 @@ async function addFromPhoto(ev){
   EXIF.getData(file,function(){
     const la=EXIF.getTag(this,"GPSLatitude"),lr=EXIF.getTag(this,"GPSLatitudeRef");
     const lo=EXIF.getTag(this,"GPSLongitude"),lor=EXIF.getTag(this,"GPSLongitudeRef");
-    if(!la||!lo){if(confirm("Nessun GPS nella foto.
-Vuoi usare la posizione GPS attuale?"))useGPS();return;}
+    if(!la||!lo){if(confirm("Nessun GPS nella foto.\nVuoi usare la posizione GPS attuale?"))useGPS();return;}
     const n=v=>typeof v==="object"&&v!==null?v.numerator/v.denominator:v;
     const d=a=>n(a[0])+n(a[1])/60+n(a[2])/3600;
     let lat=d(la),lng=d(lo);
@@ -400,7 +399,7 @@ function openSpModal(title,sub,okLabel,ll,tid){
   selCode=null;pendingLL=ll||null;editingId=tid||null;
   $("sp-modal-title").textContent=title;$("sp-modal-sub").textContent=sub;$("sp-modal-ok").textContent=okLabel;
   const cur=tid?mrkrs[tid]?.data?.code:null;if(cur)selCode=cur;
-  $("sp-grid").innerHTML=SPECIES.map(s=>`<div class="sp-opt ${s.code===cur?"sel":""}" id="opt-${s.code}" onclick="W.pickSp(\'${s.code}\')">${icoHTML(s)}<span><span style="color:var(--muted);font-size:9px;">${s.code} · </span>${s.name}</span></div>`).join("");
+  $("sp-grid").innerHTML=SPECIES.map(s=>`<div class="sp-opt ${s.code===cur?"sel":""}" id="opt-${s.code}" onclick="W.pickSp('${s.code}')">${icoHTML(s)}<span><span style="color:var(--muted);font-size:9px;">${s.code} · </span>${s.name}</span></div>`).join("");
   if(cur)setTimeout(()=>$("opt-"+cur)?.scrollIntoView({block:"center"}),60);
   $("sp-modal").classList.add("on");
 }
@@ -436,8 +435,8 @@ function popContent(id,t){
     ${t.prov?`<div class="pop-prov">⚠ Posizione approssimativa — trascina per correggere</div>`:""}
     <div class="pop-meta">cod: ${t.code} · ${dt}<br>📍 ${t.lat.toFixed(5)}, ${t.lng.toFixed(5)}</div>
     <div class="pop-btns">
-      <button class="pb pb-mod" onclick="W.startEdit(\'${id}\')">✏ Modifica specie</button>
-      <button class="pb pb-del" onclick="W.delTree(\'${id}\')">✕ Elimina</button>
+      <button class="pb pb-mod" onclick="W.startEdit('${id}')">✏ Modifica specie</button>
+      <button class="pb pb-del" onclick="W.delTree('${id}')">✕ Elimina</button>
     </div></div>`;
 }
 
