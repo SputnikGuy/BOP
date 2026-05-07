@@ -138,6 +138,42 @@ body{font-family:"DM Mono",monospace;background:var(--bg);color:var(--text);heig
 </div>
 
 <!-- MODALS -->
+<!-- EDIT SPECIES MODAL -->
+<div class="modal-bg" id="esp-modal">
+  <div class="modal-box" style="max-width:400px">
+    <h2 id="esp-title">Modifica specie</h2>
+    <div class="modal-sub" id="esp-sub"></div>
+    <div id="nsp-form" style="margin-top:4px">
+      <div class="form-row">
+        <div class="form-col"><label>Codice</label><input id="esp-code" type="text" maxlength="4"/></div>
+        <div class="form-col"><label>Simbolo</label>
+          <select id="esp-sym">
+            <option value="circle">● Cerchio</option>
+            <option value="square">■ Quadrato</option>
+            <option value="triangle">▲ Triangolo</option>
+            <option value="star">★ Stella</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-col"><label>Nome comune</label><input id="esp-name" type="text"/></div>
+      <div class="form-col"><label>Nome scientifico</label><input id="esp-sci" type="text"/></div>
+      <div class="form-col"><label>Famiglia</label><input id="esp-fam" type="text"/></div>
+      <div class="form-col"><label>Nota ecologica</label><input id="esp-note" type="text"/></div>
+      <div class="form-row" style="align-items:flex-end;gap:10px">
+        <div class="form-col"><label>Colore</label><input id="esp-color" type="color" onchange="W.updateEspPrev()" style="height:38px;width:100%;cursor:pointer;border-radius:5px;border:1px solid var(--b1);padding:2px"/></div>
+        <div style="flex:1;display:flex;align-items:center;gap:8px;font-size:11px;padding-bottom:4px"><span id="esp-ico-prev"></span><span id="esp-nm-prev" style="color:var(--text)">—</span></div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:14px;align-items:center">
+      <button class="btn btn-d" style="font-size:10px" onclick="W.deleteSpecie()">✕ Elimina specie</button>
+      <div class="modal-btns" style="margin:0">
+        <button class="btn btn-s" onclick="W.closeEspModal()">Annulla</button>
+        <button class="btn btn-p" onclick="W.saveEditSp()">Salva ✓</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-bg" id="sp-modal">
   <div class="modal-box">
     <h2 id="sp-modal-title">Aggiungi albero</h2>
@@ -299,7 +335,10 @@ function renderSidebar(q=""){
   const all=Object.values(mrkrs).map(x=>x.data);
   $("sp-list").innerHTML=SPECIES.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())||s.code.toLowerCase().includes(q.toLowerCase())).map(s=>{
     const cnt=all.filter(t=>t.code===s.code).length;
-    return`<div class="sp-row ${active.has(s.code)?"":"off"}" onclick="W.toggleSp('${s.code}')">${icoHTML(s)}<span class="sp-cd">${s.code}</span><span class="sp-nm">${s.name}</span><span class="sp-ct">${cnt||""}</span></div>`;
+    return`<div class="sp-row ${active.has(s.code)?"":"off"}">
+      <div onclick="W.toggleSp('${s.code}')" style="display:flex;align-items:center;gap:7px;flex:1;cursor:pointer;">${icoHTML(s)}<span class="sp-cd">${s.code}</span><span class="sp-nm">${s.name}</span><span class="sp-ct">${cnt||""}</span></div>
+      <button onclick="W.openEditSp('${s.code}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:2px 4px;flex-shrink:0;" title="Modifica specie">✏</button>
+    </div>`;
   }).join("");
   $("sp-vis").textContent=active.size;
   $("tot").textContent=Object.keys(mrkrs).length;
@@ -496,8 +535,109 @@ function saveNewSp(){
   active.add(code);$("nsp-modal").classList.remove("on");renderSidebar();
 }
 
+
+// ── EDIT SPECIES ─────────────────────────────
+let editingSpCode = null;
+
+function openEditSp(code){
+  const s = SPECIES.find(x=>x.code===code);
+  if(!s) return;
+  editingSpCode = code;
+  $("esp-title").textContent = "Modifica specie";
+  $("esp-sub").textContent = `${s.code} · ${s.name}`;
+  $("esp-code").value = s.code;
+  $("esp-name").value = s.name || "";
+  $("esp-sci").value = s.sci || "";
+  $("esp-fam").value = s.fam || "";
+  $("esp-note").value = s.note || "";
+  $("esp-color").value = s.color || "#3d8b5a";
+  $("esp-sym").value = s.sym || "circle";
+  updateEspPrev();
+  $("esp-modal").classList.add("on");
+}
+
+function closeEspModal(){
+  $("esp-modal").classList.remove("on");
+  editingSpCode = null;
+}
+
+function updateEspPrev(){
+  const c=$("esp-color").value, sym=$("esp-sym").value;
+  const nm=$("esp-name").value||"—";
+  const ico=$("esp-ico-prev"), r=sym==="square"?"3px":"50%";
+  if(sym==="triangle") ico.innerHTML=`<div style="width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-bottom:15px solid ${c};"></div>`;
+  else if(sym==="star") ico.innerHTML=`<span style="color:${c};font-size:16px;">★</span>`;
+  else ico.innerHTML=`<div style="width:18px;height:18px;background:${c};border-radius:${r};"></div>`;
+  $("esp-nm-prev").textContent = nm;
+}
+
+function saveEditSp(){
+  if(!editingSpCode) return;
+  const newCode = $("esp-code").value.trim().toUpperCase();
+  const name = $("esp-name").value.trim();
+  if(!newCode || !name){ alert("Codice e nome obbligatori."); return; }
+  // If code changed, check it doesn't conflict
+  if(newCode !== editingSpCode && SPECIES.find(s=>s.code===newCode)){
+    alert(`Codice "${newCode}" già esistente.`); return;
+  }
+  const idx = SPECIES.findIndex(s=>s.code===editingSpCode);
+  if(idx < 0) return;
+  // Update species
+  SPECIES[idx] = {...SPECIES[idx],
+    code: newCode, name,
+    color: $("esp-color").value,
+    sym: $("esp-sym").value,
+    sci: $("esp-sci").value.trim(),
+    fam: $("esp-fam").value.trim(),
+    note: $("esp-note").value.trim(),
+  };
+  // If code changed, update active set and all markers
+  if(newCode !== editingSpCode){
+    if(active.has(editingSpCode)){ active.delete(editingSpCode); active.add(newCode); }
+    // Update markers with old code
+    Object.entries(mrkrs).forEach(([id,{data}])=>{
+      if(data.code === editingSpCode){
+        data.code = newCode;
+        updateDoc(DOC(id),{code: newCode}).catch(console.error);
+      }
+    });
+  }
+  // Redraw all markers of this species
+  const targetCode = newCode;
+  Object.entries(mrkrs).forEach(([id,{m,data}])=>{
+    if(data.code === targetCode){
+      m.setIcon(mkIcon(targetCode, data.prov));
+      m.setPopupContent(popContent(id, data));
+    }
+  });
+  closeEspModal();
+  renderSidebar($("si").value);
+}
+
+function deleteSpecie(){
+  if(!editingSpCode) return;
+  const s = SPECIES.find(x=>x.code===editingSpCode);
+  const count = Object.values(mrkrs).filter(({data})=>data.code===editingSpCode).length;
+  const msg = count > 0
+    ? `Ci sono ${count} alberi con questa specie sulla mappa. Eliminarli tutti insieme alla specie?`
+    : `Eliminare la specie "${s?.name}"?`;
+  if(!confirm(msg)) return;
+  // Delete trees of this species from Firestore
+  if(count > 0){
+    Object.entries(mrkrs).forEach(([id,{data}])=>{
+      if(data.code===editingSpCode) deleteDoc(DOC(id)).catch(console.error);
+    });
+  }
+  // Remove from SPECIES array
+  const idx = SPECIES.findIndex(x=>x.code===editingSpCode);
+  if(idx >= 0) SPECIES.splice(idx,1);
+  active.delete(editingSpCode);
+  closeEspModal();
+  renderSidebar($("si").value);
+}
+
 // ── EXPOSE TO GLOBAL (needed for onclick in HTML) ──
-const W={openSb,closeSb,toggleAdd,useGPS,addFromPhoto,toggleSp,filterSp,openSpModal,closeSpModal,pickSp,confirmSp,startEdit,delTree,openClearModal,closeClearModal,checkClear,executeClear,exportJSON,importJSON,openNewSp,updateNspPrev,saveNewSp};
+const W={openSb,closeSb,toggleAdd,useGPS,addFromPhoto,toggleSp,filterSp,openSpModal,closeSpModal,pickSp,confirmSp,startEdit,delTree,openClearModal,closeClearModal,checkClear,executeClear,exportJSON,importJSON,openNewSp,updateNspPrev,saveNewSp,openEditSp,closeEspModal,updateEspPrev,saveEditSp,deleteSpecie};
 window.W=W;
 
 // ── MAP INIT ─────────────────────────────────
