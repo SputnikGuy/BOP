@@ -65,11 +65,9 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);heig
   align-items:center;justify-content:center;touch-action:manipulation}
 
 /* ── CTRL PANEL ── */
-#ctrl-panel{position:absolute;bottom:28px;right:8px;z-index:1000;
-  background:rgba(13,26,15,.93);border:1px solid var(--b1);border-radius:8px;
-  padding:10px 12px;font-size:10px;backdrop-filter:blur(8px);min-width:185px}
-#ctrl-panel h4{color:var(--accent);letter-spacing:1px;margin-bottom:8px;font-size:9px;text-transform:uppercase}
-.cr{display:flex;align-items:center;gap:7px;margin:5px 0}
+
+
+
 .cr input[type=range]{width:80px;accent-color:var(--accent)}
 .cr input[type=checkbox]{accent-color:var(--accent);cursor:pointer;width:14px;height:14px}
 .cr label{cursor:pointer;display:flex;align-items:center;gap:7px}
@@ -124,7 +122,7 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);heig
   #tb-lbl{display:none}
   .tbdiv{display:none}
   #gps-fab{display:flex}
-  #ctrl-panel{bottom:28px;right:4px;min-width:160px;font-size:9px}
+  
   .modal-box{border-radius:16px 16px 0 0}
 }
 @media(min-width:641px){
@@ -176,13 +174,7 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);heig
   </div>
   <div id="map"></div>
   <button id="gps-fab" onclick="useCurrentGPS()" title="Usa posizione attuale">📍</button>
-  <div id="ctrl-panel">
-    <h4>🗺 Layers</h4>
-    <div class="cr"><label><input type="checkbox" id="prov-tog" checked onchange="toggleProv()"/>Mostra provvisori</label></div>
     <h4 style="margin-top:10px">📄 Overlay</h4>
-    <div class="cr"><label><input type="checkbox" id="ov-tog" onchange="toggleOverlay()"/>Mostra overlay</label></div>
-    <div class="cr"><input type="file" accept="image/*" onchange="loadOverlay(event)" style="font-size:9px;color:var(--muted);max-width:160px"/></div>
-    <div class="cr"><span>Opacità</span><input type="range" id="ov-op" min="0" max="1" step="0.05" value="0.5" onchange="setOvOp()"/></div>
   </div>
 </div>
 
@@ -327,8 +319,8 @@ const INIT=[
 // ══════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════
-let map,ovLayer,addMode=false,pendingLL=null,editingId=null,selCode=null,pendingThumb=null;
-let trees=[],mrkrs={},active=new Set(SPECIES.map(s=>s.code)),showProv=true;
+let map,addMode=false,pendingLL=null,editingId=null,selCode=null,pendingThumb=null;
+let trees=[],mrkrs={},active=new Set(SPECIES.map(s=>s.code));const showProv=true;
 
 // ══════════════════════════════════════════════
 // SIDEBAR MOBILE
@@ -555,22 +547,10 @@ function refreshVis(){
   });
 }
 
-function toggleProv(){showProv=document.getElementById('prov-tog').checked;refreshVis();}
 
 // ══════════════════════════════════════════════
 // OVERLAY
 // ══════════════════════════════════════════════
-function loadOverlay(ev){
-  const f=ev.target.files[0];if(!f)return;
-  const r=new FileReader();
-  r.onload=e=>{
-    if(ovLayer)map.removeLayer(ovLayer);
-    ovLayer=L.imageOverlay(e.target.result,[[41.8853,12.5413],[41.8905,12.5474]],{opacity:.5,interactive:false});
-    document.getElementById('ov-tog').checked=true;ovLayer.addTo(map);
-  };r.readAsDataURL(f);
-}
-function toggleOverlay(){if(!ovLayer)return;document.getElementById('ov-tog').checked?ovLayer.addTo(map):map.removeLayer(ovLayer);}
-function setOvOp(){if(ovLayer)ovLayer.setOpacity(parseFloat(document.getElementById('ov-op').value));}
 
 // ══════════════════════════════════════════════
 // STORAGE
