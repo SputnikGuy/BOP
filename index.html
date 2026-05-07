@@ -648,9 +648,10 @@ map.on('click',e=>{if(!addMode)return;openSpModal('+ Aggiungi albero',`${e.latln
 
 try{const cs=localStorage.getItem('lp_custom');if(cs)JSON.parse(cs).forEach(s=>{if(!SPECIES.find(x=>x.code===s.code)){SPECIES.push(s);active.add(s.code);}});}catch(e){}
 try{const d=localStorage.getItem('lp_trees');trees=d?JSON.parse(d):null;}catch(e){trees=null;}
-if(!trees||!trees.length) trees=INIT.map(t=>({...t}));
+if(trees===null) trees=INIT.map(t=>({...t})); // null = mai salvato → carica INIT; [] = utente ha svuotato → rispetta
 trees.forEach(t=>putMarker(t));
 renderSidebar();
+save(); // salva subito: così il refresh trova sempre i dati corretti
 </script>
 
 <!-- CLEAR CONFIRM MODAL -->
