@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>🌿 Largo Preneste · Riforestazione</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:wght@300;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0d1a0f;--panel:#111f13;--b1:#1e3321;--b2:#2a4a2e;--accent:#7cc47e;--a2:#b5e48c;--text:#d4e8c2;--muted:#5a7a5e;--danger:#c0392b;--warn:#e67e22;--sb:280px}
+body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);height:100dvh;display:flex;overflow:hidden}
+
+/* ── SIDEBAR ── */
+#sb{width:var(--sb);background:var(--panel);border-right:1px solid var(--b1);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:transform .25s ease;z-index:500}
+#sb.hidden{transform:translateX(-100%)}
+#sb-head{padding:13px 15px 10px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between}
+#sb-head-text h1{font-family:'Fraunces',serif;font-size:17px;color:var(--accent);font-weight:600}
+#sb-head-text p{font-size:9px;color:var(--muted);margin-top:2px;letter-spacing:1.5px;text-transform:uppercase}
+#sb-close{display:none;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1}
+#sb-stats{display:flex;gap:14px;padding:7px 15px;border-bottom:1px solid var(--b1);font-size:10px;color:var(--muted)}
+#sb-stats strong{color:var(--a2)}
+#sb-search{padding:7px 8px;border-bottom:1px solid var(--b1)}
+#sb-search input{width:100%;background:var(--bg);border:1px solid var(--b1);border-radius:5px;padding:6px 9px;color:var(--text);font-size:11px;font-family:inherit;outline:none}
+#sb-search input:focus{border-color:var(--accent)}
+#sp-list{flex:1;overflow-y:auto;padding:3px;-webkit-overflow-scrolling:touch}
+.sp-row{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:5px;cursor:pointer;transition:background .1s}
+.sp-row:hover,.sp-row:active{background:var(--b1)}
+.sp-row.off{opacity:.28}
+.sp-ico{width:18px;height:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.sp-cd{font-size:9px;color:var(--muted);min-width:24px}
+.sp-nm{font-size:10px;flex:1}
+.sp-ct{font-size:10px;font-weight:500;color:var(--a2);min-width:16px;text-align:right}
+#sb-foot{padding:9px;border-top:1px solid var(--b1);display:flex;flex-direction:column;gap:6px}
+.btn-row{display:flex;gap:5px}
+.btn{padding:8px 10px;border:none;border-radius:6px;cursor:pointer;font-size:10px;font-family:inherit;font-weight:500;transition:opacity .15s;touch-action:manipulation}
+.btn:hover,.btn:active{opacity:.82}
+.btn-p{background:var(--accent);color:var(--bg)}
+.btn-s{background:var(--b1);color:var(--text)}
+.btn-d{background:var(--danger);color:#fff}
+
+/* ── MAP ── */
+#mw{flex:1;position:relative;min-width:0}
+#map{width:100%;height:100%}
+
+/* ── TOP TOOLBAR ── */
+#tb{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:1000;
+  background:rgba(13,26,15,.93);border:1px solid var(--b1);border-radius:22px;
+  padding:5px 12px;display:flex;align-items:center;gap:8px;font-size:11px;
+  backdrop-filter:blur(10px);white-space:nowrap;max-width:calc(100vw - 20px)}
+#menu-btn{display:none;background:none;border:none;color:var(--accent);font-size:18px;cursor:pointer;padding:2px 6px;line-height:1}
+#add-btn{background:var(--b1);border:none;border-radius:12px;padding:5px 12px;color:var(--text);font-family:inherit;font-size:11px;cursor:pointer;transition:all .15s;touch-action:manipulation}
+#add-btn.on{background:var(--accent);color:var(--bg);font-weight:500}
+.tb-btn{background:var(--b1);border:none;border-radius:12px;padding:5px 12px;color:var(--text);font-family:inherit;font-size:11px;cursor:pointer;touch-action:manipulation}
+.tb-btn:hover,.tb-btn:active{background:var(--b2)}
+.tbdiv{color:var(--b2)}
+#tb-lbl{color:var(--muted);font-size:10px;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+
+/* ── GPS BUTTON MOBILE ── */
+#gps-fab{display:none;position:absolute;bottom:90px;right:12px;z-index:1000;
+  width:48px;height:48px;border-radius:50%;background:var(--accent);color:var(--bg);
+  border:none;font-size:20px;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.4);
+  align-items:center;justify-content:center;touch-action:manipulation}
+
+/* ── CTRL PANEL ── */
+#ctrl-panel{position:absolute;bottom:28px;right:8px;z-index:1000;
+  background:rgba(13,26,15,.93);border:1px solid var(--b1);border-radius:8px;
+  padding:10px 12px;font-size:10px;backdrop-filter:blur(8px);min-width:185px}
+#ctrl-panel h4{color:var(--accent);letter-spacing:1px;margin-bottom:8px;font-size:9px;text-transform:uppercase}
+.cr{display:flex;align-items:center;gap:7px;margin:5px 0}
+.cr input[type=range]{width:80px;accent-color:var(--accent)}
+.cr input[type=checkbox]{accent-color:var(--accent);cursor:pointer;width:14px;height:14px}
+.cr label{cursor:pointer;display:flex;align-items:center;gap:7px}
+
+/* ── OVERLAY (mobile sidebar) ── */
+#sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400}
+
+/* ── MODALS ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:2000;align-items:flex-end;justify-content:center}
+.modal-bg.on{display:flex}
+.modal-box{background:var(--panel);border:1px solid var(--b1);border-radius:12px 12px 0 0;padding:20px;
+  width:100%;max-width:500px;max-height:90dvh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.modal-box h2{font-family:'Fraunces',serif;font-size:16px;color:var(--accent);margin-bottom:4px}
+.modal-sub{font-size:9px;color:var(--muted);margin-bottom:14px;letter-spacing:.5px}
+#sp-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;max-height:50dvh;overflow-y:auto;margin-bottom:14px;-webkit-overflow-scrolling:touch}
+.sp-opt{display:flex;align-items:center;gap:8px;padding:9px;border:1px solid var(--b1);border-radius:7px;cursor:pointer;transition:all .12s;touch-action:manipulation}
+.sp-opt:hover,.sp-opt:active{border-color:var(--accent);background:var(--b1)}
+.sp-opt.sel{border-color:var(--accent);background:#1a3d1c}
+.sp-opt span{font-size:10px;line-height:1.3}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end}
+#nsp-form{display:flex;flex-direction:column;gap:9px}
+#nsp-form label{font-size:10px;color:var(--muted)}
+#nsp-form input,#nsp-form select{background:var(--bg);border:1px solid var(--b1);border-radius:5px;padding:8px 9px;color:var(--text);font-size:11px;font-family:inherit;outline:none;width:100%}
+.form-row{display:flex;gap:8px}
+.form-col{display:flex;flex-direction:column;gap:4px;flex:1}
+
+/* ── LEAFLET OVERRIDES ── */
+.leaflet-popup-content-wrapper{background:#0d1a0f!important;border:1px solid #1e3321!important;border-radius:9px!important;color:#d4e8c2!important;box-shadow:0 4px 20px rgba(0,0,0,.5)!important}
+.leaflet-popup-tip{background:#0d1a0f!important}
+.leaflet-control-layers{background:#111f13!important;border:1px solid #1e3321!important;color:#d4e8c2!important;font-family:'DM Mono',monospace!important;font-size:11px!important}
+.leaflet-control-layers label{color:#d4e8c2!important}
+.pop{font-family:'DM Mono',monospace;font-size:11px;line-height:1.65;max-width:250px}
+.pop-name{font-family:'Fraunces',serif;font-size:14px;color:var(--accent);font-weight:600}
+.pop-sci{font-style:italic;color:var(--muted);font-size:10px;margin-bottom:4px}
+.pop-fam{font-size:9px;color:var(--b2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
+.pop-note{font-size:10px;color:#aac8a0;line-height:1.5;margin-bottom:8px;border-left:2px solid var(--b2);padding-left:7px}
+.pop-meta{font-size:9px;color:var(--muted);margin-bottom:8px}
+.pop-prov{font-size:9px;color:var(--warn);margin-bottom:6px;background:rgba(230,126,34,.12);padding:3px 6px;border-radius:3px}
+.pop-btns{display:flex;gap:6px;flex-wrap:wrap}
+.pb{padding:6px 10px;border:none;border-radius:4px;cursor:pointer;font-size:10px;font-family:'DM Mono',monospace;touch-action:manipulation}
+.pb-mod{background:var(--b2);color:var(--text)}
+.pb-del{background:var(--danger);color:#fff}
+
+/* ── RESPONSIVE MOBILE ── */
+@media(max-width:640px){
+  :root{--sb:85vw}
+  #sb{position:fixed;top:0;left:0;height:100%;transform:translateX(-100%)}
+  #sb.open{transform:translateX(0)}
+  #sb-close{display:block}
+  #sb-overlay.on{display:block}
+  #menu-btn{display:block}
+  #tb-lbl{display:none}
+  .tbdiv{display:none}
+  #gps-fab{display:flex}
+  #ctrl-panel{bottom:28px;right:4px;min-width:160px;font-size:9px}
+  .modal-box{border-radius:16px 16px 0 0}
+}
+@media(min-width:641px){
+  .modal-bg{align-items:center}
+  .modal-box{border-radius:12px;max-height:85dvh}
+}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--b1);border-radius:3px}
+</style>
+</head>
+<body>
+
+<div id="sb-overlay" onclick="closeSb()"></div>
+
+<div id="sb">
+  <div id="sb-head">
+    <div id="sb-head-text">
+      <h1>🌿 Largo Preneste</h1>
+      <p>Riforestazione Urbana · Roma</p>
+    </div>
+    <button id="sb-close" onclick="closeSb()">×</button>
+  </div>
+  <div id="sb-stats">
+    <span>Alberi: <strong id="tot">0</strong></span>
+    <span>Specie: <strong id="sp-vis">40</strong></span>
+  </div>
+  <div id="sb-search"><input id="si" type="text" placeholder="🔍 cerca specie..."/></div>
+  <div id="sp-list"></div>
+  <div id="sb-foot">
+    <div class="btn-row">
+      <button class="btn btn-s" style="flex:1" onclick="exportJSON()">↑ Esporta</button>
+      <button class="btn btn-s" style="flex:1" onclick="document.getElementById('imp').click()">↓ Importa</button>
+      <input type="file" id="imp" accept=".json" style="display:none" onchange="importJSON(event)">
+    </div>
+    <button class="btn btn-s" onclick="openNewSp()">＋ Nuova specie</button>
+    <button class="btn btn-d" style="font-size:10px" onclick="openClearModal()">✕ Cancella tutti i dati</button>
+  </div>
+</div>
+
+<div id="mw">
+  <div id="tb">
+    <button id="menu-btn" onclick="openSb()">☰</button>
+    <button id="add-btn" onclick="toggleAdd()">＋ Aggiungi</button>
+    <span class="tbdiv">|</span>
+    <button class="tb-btn" onclick="useCurrentGPS()">📍 GPS</button>
+    <button class="tb-btn" onclick="document.getElementById('photo-in').click()">📷 Foto</button>
+    <input type="file" id="photo-in" accept="image/*" style="display:none" onchange="addFromPhoto(event)">
+    <span class="tbdiv">|</span>
+    <span id="tb-lbl">seleziona modalità</span>
+  </div>
+  <div id="map"></div>
+  <button id="gps-fab" onclick="useCurrentGPS()" title="Usa posizione attuale">📍</button>
+  <div id="ctrl-panel">
+    <h4>🗺 Layers</h4>
+    <div class="cr"><label><input type="checkbox" id="prov-tog" checked onchange="toggleProv()"/>Mostra provvisori</label></div>
+    <h4 style="margin-top:10px">📄 Overlay</h4>
+    <div class="cr"><label><input type="checkbox" id="ov-tog" onchange="toggleOverlay()"/>Mostra overlay</label></div>
+    <div class="cr"><input type="file" accept="image/*" onchange="loadOverlay(event)" style="font-size:9px;color:var(--muted);max-width:160px"/></div>
+    <div class="cr"><span>Opacità</span><input type="range" id="ov-op" min="0" max="1" step="0.05" value="0.5" onchange="setOvOp()"/></div>
+  </div>
+</div>
+
+<!-- SPECIES MODAL -->
+<div class="modal-bg" id="sp-modal">
+  <div class="modal-box">
+    <h2 id="sp-modal-title">Aggiungi albero</h2>
+    <div class="modal-sub" id="sp-modal-sub"></div>
+    <div id="sp-grid"></div>
+    <div class="modal-btns">
+      <button class="btn btn-s" onclick="closeSpModal()">Annulla</button>
+      <button class="btn btn-p" id="sp-modal-ok" onclick="confirmSp()">Aggiungi</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW SPECIES MODAL -->
+<div class="modal-bg" id="nsp-modal">
+  <div class="modal-box" style="max-width:400px">
+    <h2>Nuova specie</h2>
+    <div class="modal-sub">Aggiungi una specie non presente nell'elenco</div>
+    <div id="nsp-form">
+      <div class="form-row">
+        <div class="form-col"><label>Codice (2-4 car.)</label><input id="nsp-code" type="text" maxlength="4" placeholder="es. Fp"/></div>
+        <div class="form-col"><label>Simbolo</label>
+          <select id="nsp-sym">
+            <option value="circle">● Cerchio</option>
+            <option value="square">■ Quadrato</option>
+            <option value="triangle">▲ Triangolo</option>
+            <option value="star">★ Stella</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-col"><label>Nome comune</label><input id="nsp-name" type="text" placeholder="es. Fico Pagliaio"/></div>
+      <div class="form-col"><label>Nome scientifico (opz.)</label><input id="nsp-sci" type="text" placeholder="es. Ficus carica"/></div>
+      <div class="form-col"><label>Famiglia (opz.)</label><input id="nsp-fam" type="text" placeholder="es. Moraceae"/></div>
+      <div class="form-col"><label>Nota ecologica (opz.)</label><input id="nsp-note" type="text" placeholder="breve descrizione..."/></div>
+      <div class="form-row" style="align-items:flex-end;gap:10px">
+        <div class="form-col"><label>Colore</label><input id="nsp-color" type="color" value="#3d8b5a" style="height:38px;width:100%;cursor:pointer;border-radius:5px;border:1px solid var(--b1);padding:2px"/></div>
+        <div style="flex:1;display:flex;align-items:center;gap:8px;font-size:11px;padding-bottom:4px">
+          <span id="nsp-ico-prev"></span><span id="nsp-nm-prev" style="color:var(--text)">—</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-btns" style="margin-top:14px">
+      <button class="btn btn-s" onclick="document.getElementById('nsp-modal').classList.remove('on')">Annulla</button>
+      <button class="btn btn-p" onclick="saveNewSp()">Salva specie ✓</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// SPECIES
+// ══════════════════════════════════════════════
+let SPECIES=[
+{code:'Cn',name:'Carpino Nero',color:'#3d8b5a',sym:'circle',sci:'Ostrya carpinifolia',fam:'Betulaceae',note:'Pioniere dei boschi secchi calcarei. Legno durissimo. Ottimo per fauna.'},
+{code:'Pe',name:'Pero',color:'#95d5b2',sym:'circle',sci:'Pyrus communis',fam:'Rosaceae',note:'Fruttifero caducifoglio. Fiorisce a marzo, fondamentale per impollinatori.'},
+{code:'Pr',name:'Perasto',color:'#74c69d',sym:'circle',sci:'Pyrus pyraster',fam:'Rosaceae',note:'Pero selvatico autoctono, antenato dei peri coltivati. Longevo e resistente.'},
+{code:'N',name:'Nocciolo',color:'#b7e4c7',sym:'circle',sci:'Corylus avellana',fam:'Betulaceae',note:'Prima specie a fiorire (gennaio). Nocciole eduli, habitat per uccelli.'},
+{code:'Ti',name:'Tiglio',color:'#52b788',sym:'circle',sci:'Tilia cordata',fam:'Malvaceae',note:'Grande ombreggiante. Fioritura giugno-luglio mellifera e profumatissima.'},
+{code:'PN',name:'Pioppo Nero',color:'#40916c',sym:'circle',sci:'Populus nigra',fam:'Salicaceae',note:'Pioniere ripariale a crescita rapida. Ottimo per fitorimedio e CO2.'},
+{code:'Ab',name:'Abele',color:'#adb5bd',sym:'circle',sci:'Populus alba',fam:'Salicaceae',note:'Pioppo bianco, foglie argentee. Preferisce suoli umidi, cresce veloce.'},
+{code:'U',name:'Ulivo',color:'#a8c686',sym:'circle',sci:'Olea europaea',fam:'Oleaceae',note:'Simbolo del Mediterraneo. Vive millenni, edule, importante per biodiversita.'},
+{code:'Ov',name:'Olivastro',color:'#70a288',sym:'circle',sci:'Olea europaea sylvestris',fam:'Oleaceae',note:'Forma selvatica autoctona. Piu resistente e resiliente alla siccita.'},
+{code:'Ar',name:'Albicocco',color:'#f4a261',sym:'circle',sci:'Prunus armeniaca',fam:'Rosaceae',note:'Fiorisce tra febbraio e marzo. Frutti ricchi di betacarotene.'},
+{code:'Li',name:'Limone',color:'#f9c74f',sym:'circle',sci:'Citrus limon',fam:'Rutaceae',note:'Sempreverde aromatico. Sensibile al gelo, necessita esposizione riparata.'},
+{code:'Ma',name:'Mandorlo',color:'#f4acb7',sym:'circle',sci:'Prunus dulcis',fam:'Rosaceae',note:'Prima pianta a fiorire (gen-feb). Annuncia la primavera. Vitamina E.'},
+{code:'Mc',name:'Melo Cotogno',color:'#e9c46a',sym:'circle',sci:'Cydonia oblonga',fam:'Rosaceae',note:'Antico fruttifero mediterraneo. Ottimo per marmellate.'},
+{code:'G',name:'Gelso',color:'#7b2d8b',sym:'circle',sci:'Morus nigra / Morus alba',fam:'Moraceae',note:'Fondamentale per biodiversita. Frutti eduli, amato da uccelli e insetti.'},
+{code:'F',name:'Fico Settembrino',color:'#6a4c93',sym:'circle',sci:'Ficus carica',fam:'Moraceae',note:'Varieta autunnale. Molto rustico, fondamentale per fauna locale.'},
+{code:'Vi',name:'Vite',color:'#7209b7',sym:'circle',sci:'Vitis vinifera',fam:'Vitaceae',note:'Liana rampicante. Grappoli eduli a fine estate.'},
+{code:'Al',name:'Albero di Giuda',color:'#e63946',sym:'circle',sci:'Cercis siliquastrum',fam:'Fabaceae',note:'Spettacolare fioritura rosa sui rami nudi (marzo-aprile).'},
+{code:'Ai',name:'Ailanto',color:'#d62828',sym:'circle',sci:'Ailanthus altissima',fam:'Simaroubaceae',note:'ATTENZIONE: specie invasiva. Monitorarne la diffusione regolarmente.'},
+{code:'Ol',name:'Olmo',color:'#457b9d',sym:'circle',sci:'Ulmus minor',fam:'Ulmaceae',note:'Grande albero autoctono, ridotto dalla grafiosi. Legno flessibile.'},
+{code:'Sa',name:'Salice',color:'#a7c957',sym:'circle',sci:'Salix sp.',fam:'Salicaceae',note:'Essenziale per fauna ripariale. Cresce veloce su suoli umidi.'},
+{code:'Q',name:'Quercia',color:'#606c38',sym:'circle',sci:'Quercus pubescens',fam:'Fagaceae',note:'Autoctona ambienti aridi. Ospita 300+ specie di insetti.'},
+{code:'Ro',name:'Rovere',color:'#8b5e3c',sym:'circle',sci:'Quercus petraea',fam:'Fagaceae',note:'Quercia da bosco, longeva e maestosa. Ghiande per fauna.'},
+{code:'Le',name:'Leccio',color:'#1b4332',sym:'square',sci:'Quercus ilex',fam:'Fagaceae',note:'Sempreverde mediterraneo per eccellenza. Resistente a siccita e fuoco.'},
+{code:'A',name:'Alloro',color:'#2a9d8f',sym:'circle',sci:'Laurus nobilis',fam:'Lauraceae',note:'Sempreverde aromatico simbolo di gloria. Bacche per merli e tordi.'},
+{code:'Mi',name:'Mirto',color:'#4cc9f0',sym:'circle',sci:'Myrtus communis',fam:'Myrtaceae',note:'Arbusto mediterraneo aromatico. Bacche eduli. Fiori melliferi.'},
+{code:'Gi',name:'Ginepro',color:'#283618',sym:'circle',sci:'Juniperus communis',fam:'Cupressaceae',note:'Arbusto pioniero su terreni poveri. Bacche aromatiche per gin.'},
+{code:'Pg',name:'Prugnolo',color:'#1d3557',sym:'circle',sci:'Prunus spinosa',fam:'Rosaceae',note:'Arbusto spinoso, siepi impenetrabili. Bacche per marmellate.'},
+{code:'Rc',name:'Rosa Canina',color:'#e9c46a',sym:'circle',sci:'Rosa canina',fam:'Rosaceae',note:'Rosa selvatica autoctona. Cinorrodi ricchi di vitamina C.'},
+{code:'Ros',name:'Rosa',color:'#e76f51',sym:'circle',sci:'Rosa sp.',fam:'Rosaceae',note:'Arbusto ornamentale. Fiori profumati e melliferi.'},
+{code:'B',name:'Biancospino',color:'#d8f3dc',sym:'square',sci:'Crataegus monogyna',fam:'Rosaceae',note:'Siepe difensiva naturale. Bacche rosse per uccelli migratori.'},
+{code:'Vib',name:'Viburno',color:'#fb8500',sym:'circle',sci:'Viburnum tinus',fam:'Adoxaceae',note:'Sempreverde ornamentale. Fiorisce in inverno. Bacche per uccelli.'},
+{code:'Lig',name:'Ligustro',color:'#023047',sym:'triangle',sci:'Ligustrum vulgare',fam:'Oleaceae',note:'Arbusto autoctono da siepe. Bacche fondamentali per uccelli migratori.'},
+{code:'Ac',name:'Robinia/Acacia',color:'#ffb703',sym:'star',sci:'Robinia pseudoacacia',fam:'Fabaceae',note:'Azotofissatrice, migliora il suolo. Ottima per api a maggio.'},
+{code:'Ne',name:'Nespolo',color:'#f48c06',sym:'circle',sci:'Mespilus germanica',fam:'Rosaceae',note:'Antico fruttifero medievale. Frutto edule dopo le gelate.'},
+{code:'Bag',name:'Bagolino',color:'#8ecae6',sym:'circle',sci:'Celtis australis',fam:'Cannabaceae',note:'Bagolaro, albero da ombra. Drupe eduli per uccelli. Resistente al caldo.'},
+{code:'Bp',name:'Baretto del Prete',color:'#6d6875',sym:'circle',sci:'Euonymus europaeus',fam:'Celastraceae',note:'Margini boschivi. Frutti rosa vistosi in autunno.'},
+{code:'Ci',name:'Cipresso',color:'#386641',sym:'circle',sci:'Cupressus sempervirens',fam:'Cupressaceae',note:'Sempreverde simbolo italiano. Frangivento. Vive sino a 1000 anni.'},
+{code:'Or',name:'Orniello',color:'#ffd60a',sym:'circle',sci:'Fraxinus ornus',fam:'Oleaceae',note:'Frassino da manna. Fioritura bianca in maggio. Autoctono calcareo.'},
+{code:'Lo',name:'Lavanda',color:'#9b72cf',sym:'circle',sci:'Lavandula angustifolia',fam:'Lamiaceae',note:'Aromatica mellifera. Fiorisce giugno-luglio. Repellente naturale.'},
+{code:'Sd',name:'Sedice/Verbasco',color:'#d4e09b',sym:'circle',sci:'Verbascum thapsus',fam:'Scrophulariaceae',note:'Biennale pioniera fino a 2m. Foglie fitoterapiche. Fiori gialli.'},
+];
+
+const INIT=[
+{id:'p01',lat:41.8898,lng:12.5432,code:'Le',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p02',lat:41.8900,lng:12.5444,code:'Q',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p03',lat:41.8896,lng:12.5426,code:'Cn',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p04',lat:41.8897,lng:12.5458,code:'Ro',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p05',lat:41.8899,lng:12.5420,code:'PN',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p06',lat:41.8894,lng:12.5450,code:'Ab',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p07',lat:41.8893,lng:12.5463,code:'N',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p08',lat:41.8888,lng:12.5438,code:'U',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p09',lat:41.8886,lng:12.5450,code:'Al',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p10',lat:41.8883,lng:12.5430,code:'Ac',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p11',lat:41.8889,lng:12.5462,code:'Bag',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p12',lat:41.8885,lng:12.5420,code:'Pr',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p13',lat:41.8882,lng:12.5465,code:'Bp',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p14',lat:41.8879,lng:12.5444,code:'A',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p15',lat:41.8878,lng:12.5434,code:'B',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p16',lat:41.8877,lng:12.5454,code:'Lig',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p17',lat:41.8881,lng:12.5418,code:'Ci',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p18',lat:41.8878,lng:12.5463,code:'Or',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p19',lat:41.8875,lng:12.5440,code:'Ol',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p20',lat:41.8872,lng:12.5450,code:'G',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p21',lat:41.8876,lng:12.5430,code:'Ne',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p22',lat:41.8873,lng:12.5460,code:'Ti',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p23',lat:41.8869,lng:12.5447,code:'F',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p24',lat:41.8868,lng:12.5435,code:'Mi',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p25',lat:41.8871,lng:12.5457,code:'Pe',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p26',lat:41.8866,lng:12.5444,code:'Rc',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p27',lat:41.8872,lng:12.5424,code:'Vib',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p28',lat:41.8868,lng:12.5460,code:'Sa',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p29',lat:41.8874,lng:12.5467,code:'Ros',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p30',lat:41.8862,lng:12.5440,code:'Ov',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p31',lat:41.8860,lng:12.5450,code:'Li',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p32',lat:41.8863,lng:12.5430,code:'Ma',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p33',lat:41.8861,lng:12.5460,code:'Vi',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p34',lat:41.8865,lng:12.5420,code:'Pg',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p35',lat:41.8858,lng:12.5443,code:'Gi',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p36',lat:41.8864,lng:12.5454,code:'Mc',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p37',lat:41.8877,lng:12.5418,code:'Lo',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p38',lat:41.8869,lng:12.5428,code:'Ar',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p39',lat:41.8863,lng:12.5467,code:'Sd',ts:'2025-03-01T09:00:00Z',prov:true},
+{id:'p40',lat:41.8884,lng:12.5436,code:'Ai',ts:'2025-03-01T09:00:00Z',prov:true},
+];
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let map,ovLayer,addMode=false,pendingLL=null,editingId=null,selCode=null,pendingThumb=null;
+let trees=[],mrkrs={},active=new Set(SPECIES.map(s=>s.code)),showProv=true;
+
+// ══════════════════════════════════════════════
+// SIDEBAR MOBILE
+// ══════════════════════════════════════════════
+function openSb(){document.getElementById('sb').classList.add('open');document.getElementById('sb-overlay').classList.add('on');}
+function closeSb(){document.getElementById('sb').classList.remove('open');document.getElementById('sb-overlay').classList.remove('on');}
+
+// ══════════════════════════════════════════════
+// ICONS
+// ══════════════════════════════════════════════
+function icoHTML(s){
+  if(s.sym==='triangle') return`<div class="sp-ico"><div style="width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:14px solid ${s.color};"></div></div>`;
+  if(s.sym==='star') return`<div class="sp-ico" style="color:${s.color};font-size:15px;line-height:1;">★</div>`;
+  const r=s.sym==='square'?'3px':'50%';
+  return`<div class="sp-ico" style="background:${s.color};border-radius:${r};border:1.5px solid rgba(255,255,255,.2);font-size:7px;color:white;font-weight:700;">${s.code.substring(0,2)}</div>`;
+}
+
+function mkIcon(code,prov){
+  const s=SPECIES.find(x=>x.code===code);
+  if(!s) return L.divIcon({html:'?',className:''});
+  const c=s.color,cd=s.code.substring(0,2),da=prov?'stroke-dasharray="4 2"':'';
+  let svg;
+  if(s.sym==='triangle'){
+    svg=`<svg width="26" height="26" viewBox="0 0 26 26"><polygon points="13,2 24,23 2,23" fill="${c}" stroke="white" stroke-width="1.5"/>${prov?`<polygon points="13,2 24,23 2,23" fill="none" stroke="#e67e22" stroke-width="1.5" ${da}/>`:''}
+    <text x="13" y="19" text-anchor="middle" font-size="7" fill="white" font-family="monospace" font-weight="bold">${cd}</text></svg>`;
+  }else if(s.sym==='star'){
+    svg=`<svg width="26" height="26" viewBox="0 0 26 26"><polygon points="13,2 16,10 24,10 18,15 20,23 13,18 6,23 8,15 2,10 10,10" fill="${c}" stroke="white" stroke-width="1"/>${prov?`<polygon points="13,2 16,10 24,10 18,15 20,23 13,18 6,23 8,15 2,10 10,10" fill="none" stroke="#e67e22" stroke-width="1.5" ${da}/>`:''}
+    <text x="13" y="17" text-anchor="middle" font-size="6" fill="white" font-family="monospace">${cd}</text></svg>`;
+  }else if(s.sym==='square'){
+    svg=`<svg width="24" height="24" viewBox="0 0 24 24"><rect x="1" y="1" width="22" height="22" rx="3" fill="${c}" stroke="white" stroke-width="1.5"/>${prov?`<rect x="1" y="1" width="22" height="22" rx="3" fill="none" stroke="#e67e22" stroke-width="1.5" ${da}/>`:''}
+    <text x="12" y="15" text-anchor="middle" font-size="7" fill="white" font-family="monospace" font-weight="bold">${cd}</text></svg>`;
+  }else{
+    svg=`<svg width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="13" r="12" fill="${c}" stroke="white" stroke-width="1.5"/>${prov?`<circle cx="13" cy="13" r="12" fill="none" stroke="#e67e22" stroke-width="1.5" ${da}/>`:''}
+    <text x="13" y="16.5" text-anchor="middle" font-size="7.5" fill="white" font-family="monospace" font-weight="bold">${cd}</text></svg>`;
+  }
+  return L.divIcon({html:svg,className:'',iconSize:[26,26],iconAnchor:[13,13]});
+}
+
+// ══════════════════════════════════════════════
+// SIDEBAR RENDER
+// ══════════════════════════════════════════════
+function renderSidebar(q=''){
+  const el=document.getElementById('sp-list');
+  el.innerHTML=SPECIES.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())||s.code.toLowerCase().includes(q.toLowerCase())).map(s=>{
+    const cnt=trees.filter(t=>t.code===s.code).length;
+    return`<div class="sp-row ${active.has(s.code)?'':'off'}" onclick="toggleSp('${s.code}')">${icoHTML(s)}<span class="sp-cd">${s.code}</span><span class="sp-nm">${s.name}</span><span class="sp-ct">${cnt||''}</span></div>`;
+  }).join('');
+  document.getElementById('sp-vis').textContent=active.size;
+  document.getElementById('tot').textContent=trees.length;
+}
+
+function toggleSp(code){
+  if(active.has(code)) active.delete(code); else active.add(code);
+  renderSidebar(document.getElementById('si').value);
+  refreshVis();
+}
+document.getElementById('si').addEventListener('input',e=>renderSidebar(e.target.value));
+
+// ══════════════════════════════════════════════
+// ADD MODE
+// ══════════════════════════════════════════════
+function toggleAdd(){
+  addMode=!addMode;
+  const btn=document.getElementById('add-btn');
+  btn.classList.toggle('on',addMode);
+  btn.textContent=addMode?'✕ Esci':'＋ Aggiungi';
+  document.getElementById('tb-lbl').textContent=addMode?'tocca la mappa':'seleziona modalita';
+  map.getContainer().style.cursor=addMode?'crosshair':'';
+}
+
+// ══════════════════════════════════════════════
+// GPS NATIVO (funziona su iPhone senza problemi EXIF)
+// ══════════════════════════════════════════════
+function useCurrentGPS(){
+  if(!navigator.geolocation){alert('GPS non disponibile su questo dispositivo.');return;}
+  document.getElementById('tb-lbl').textContent='📡 Rilevamento GPS...';
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      const lat=pos.coords.latitude,lng=pos.coords.longitude;
+      map.setView([lat,lng],20);
+      document.getElementById('tb-lbl').textContent=`📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+      openSpModal('📍 Aggiungi albero (GPS)',`Posizione attuale: ${lat.toFixed(5)}, ${lng.toFixed(5)}`,'Aggiungi ✓',{lat,lng},null);
+    },
+    err=>{
+      document.getElementById('tb-lbl').textContent='GPS non disponibile';
+      alert('Impossibile ottenere la posizione.\nAssicurati di aver consentito l\'accesso alla posizione per questo sito.');
+    },
+    {enableHighAccuracy:true,timeout:10000,maximumAge:0}
+  );
+}
+
+// ══════════════════════════════════════════════
+// PHOTO + EXIF (fallback per chi ha GPS nelle foto)
+// ══════════════════════════════════════════════
+function makeThumbnail(file,cb){
+  const url=URL.createObjectURL(file);
+  const img=new Image();
+  img.onload=()=>{
+    const mw=220,mh=160,r=Math.min(mw/img.width,mh/img.height);
+    const c=document.createElement('canvas');
+    c.width=Math.round(img.width*r);c.height=Math.round(img.height*r);
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    URL.revokeObjectURL(url);cb(c.toDataURL('image/jpeg',0.72));
+  };
+  img.onerror=()=>{URL.revokeObjectURL(url);cb(null);};
+  img.src=url;
+}
+
+function addFromPhoto(ev){
+  const file=ev.target.files[0];if(!file)return;ev.target.value='';
+  if(typeof EXIF==='undefined'){alert('Libreria EXIF non caricata. Usa il pulsante GPS.');return;}
+  makeThumbnail(file,thumb=>{
+    pendingThumb=thumb;
+    EXIF.getData(file,function(){
+      const la=EXIF.getTag(this,'GPSLatitude'),lr=EXIF.getTag(this,'GPSLatitudeRef');
+      const lo=EXIF.getTag(this,'GPSLongitude'),lor=EXIF.getTag(this,'GPSLongitudeRef');
+      if(!la||!lo){
+        // Su iOS il GPS puo essere rimosso — usiamo il GPS live come fallback
+        pendingThumb=null;
+        if(confirm('Nessun GPS trovato nella foto (tipico su iPhone).\nVuoi usare la tua posizione attuale invece?')){
+          useCurrentGPS();
+        }
+        return;
+      }
+      function n(v){return typeof v==='object'&&v!==null?v.numerator/v.denominator:v;}
+      function d(a){return n(a[0])+n(a[1])/60+n(a[2])/3600;}
+      let lat=d(la),lng=d(lo);
+      if(lr==='S')lat=-lat;if(lor==='W')lng=-lng;
+      map.setView([lat,lng],20);
+      openSpModal('📷 Albero da foto',`GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)}`,'Aggiungi ✓',{lat,lng},null);
+    });
+  });
+}
+
+// ══════════════════════════════════════════════
+// SPECIES MODAL
+// ══════════════════════════════════════════════
+function openSpModal(title,sub,okLabel,ll,tid){
+  selCode=null;pendingLL=ll||null;editingId=tid||null;
+  document.getElementById('sp-modal-title').textContent=title;
+  document.getElementById('sp-modal-sub').textContent=sub;
+  document.getElementById('sp-modal-ok').textContent=okLabel;
+  const cur=tid?trees.find(t=>t.id===tid)?.code:null;
+  if(cur) selCode=cur;
+  document.getElementById('sp-grid').innerHTML=SPECIES.map(s=>`<div class="sp-opt ${s.code===cur?'sel':''}" id="opt-${s.code}" onclick="pickSp('${s.code}')">${icoHTML(s)}<span><span style="color:var(--muted);font-size:9px;">${s.code} · </span>${s.name}</span></div>`).join('');
+  if(cur) setTimeout(()=>document.getElementById('opt-'+cur)?.scrollIntoView({block:'center'}),60);
+  document.getElementById('sp-modal').classList.add('on');
+}
+function pickSp(code){selCode=code;document.querySelectorAll('.sp-opt').forEach(e=>e.classList.remove('sel'));document.getElementById('opt-'+code)?.classList.add('sel');}
+function closeSpModal(){document.getElementById('sp-modal').classList.remove('on');pendingLL=null;editingId=null;selCode=null;}
+
+function confirmSp(){
+  if(!selCode) return;
+  if(editingId){
+    const t=trees.find(x=>x.id===editingId);
+    if(t){t.code=selCode;t.prov=false;redrawMarker(t);}
+    save();closeSpModal();renderSidebar(document.getElementById('si').value);
+  }else if(pendingLL){
+    addTree(pendingLL.lat,pendingLL.lng,selCode,false,pendingThumb);
+    pendingThumb=null;closeSpModal();
+  }
+}
+
+// ══════════════════════════════════════════════
+// TREE MARKERS
+// ══════════════════════════════════════════════
+function addTree(lat,lng,code,prov,thumb){
+  const t={id:'t'+Date.now(),lat,lng,code,ts:new Date().toISOString(),prov:!!prov,photo:thumb||null};
+  trees.push(t);putMarker(t);save();renderSidebar(document.getElementById('si').value);
+}
+
+function popContent(t){
+  const s=SPECIES.find(x=>x.code===t.code);
+  const dt=new Date(t.ts).toLocaleDateString('it-IT');
+  return`<div class="pop">
+    <div class="pop-name">${s?s.name:t.code}</div>
+    ${s&&s.fam?`<div class="pop-fam">${s.fam}</div>`:''}
+    ${s&&s.sci?`<div class="pop-sci">${s.sci}</div>`:''}
+    ${s&&s.note?`<div class="pop-note">${s.note}</div>`:''}
+    ${t.photo?`<img src="${t.photo}" style="width:100%;border-radius:5px;margin-bottom:8px;border:1px solid var(--b1);display:block;"/>`:``}
+    ${t.prov?`<div class="pop-prov">⚠ Posizione approssimativa — trascina per correggere</div>`:''}
+    <div class="pop-meta">cod: ${t.code} · ${dt}<br>📍 ${t.lat.toFixed(5)}, ${t.lng.toFixed(5)}</div>
+    <div class="pop-btns">
+      <button class="pb pb-mod" onclick="startEdit('${t.id}')">✏ Modifica specie</button>
+      <button class="pb pb-del" onclick="delTree('${t.id}')">✕ Elimina</button>
+    </div></div>`;
+}
+
+function putMarker(t){
+  const m=L.marker([t.lat,t.lng],{icon:mkIcon(t.code,t.prov),draggable:true});
+  m.on('dragend',e=>{
+    const p=e.target.getLatLng();t.lat=p.lat;t.lng=p.lng;t.prov=false;
+    m.setIcon(mkIcon(t.code,false));m.setPopupContent(popContent(t));save();
+  });
+  m.bindPopup(popContent(t),{maxWidth:260});
+  const show=active.has(t.code)&&(showProv||!t.prov);
+  if(show) m.addTo(map);
+  mrkrs[t.id]={m,data:t};
+}
+
+function redrawMarker(t){
+  const{m}=mrkrs[t.id];
+  m.setIcon(mkIcon(t.code,t.prov));m.setPopupContent(popContent(t));
+  mrkrs[t.id].data=t;
+}
+
+function startEdit(id){
+  map.closePopup();
+  const t=trees.find(x=>x.id===id);if(!t)return;
+  openSpModal('Modifica specie',`${t.lat.toFixed(5)}, ${t.lng.toFixed(5)}`,'Salva ✓',null,id);
+}
+
+function delTree(id){
+  if(!mrkrs[id])return;
+  map.removeLayer(mrkrs[id].m);delete mrkrs[id];
+  trees=trees.filter(t=>t.id!==id);save();map.closePopup();
+  renderSidebar(document.getElementById('si').value);
+}
+
+function refreshVis(){
+  Object.entries(mrkrs).forEach(([id,{m,data}])=>{
+    const show=active.has(data.code)&&(showProv||!data.prov);
+    if(show){if(!map.hasLayer(m))m.addTo(map);}else{if(map.hasLayer(m))map.removeLayer(m);}
+  });
+}
+
+function toggleProv(){showProv=document.getElementById('prov-tog').checked;refreshVis();}
+
+// ══════════════════════════════════════════════
+// OVERLAY
+// ══════════════════════════════════════════════
+function loadOverlay(ev){
+  const f=ev.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    if(ovLayer)map.removeLayer(ovLayer);
+    ovLayer=L.imageOverlay(e.target.result,[[41.8853,12.5413],[41.8905,12.5474]],{opacity:.5,interactive:false});
+    document.getElementById('ov-tog').checked=true;ovLayer.addTo(map);
+  };r.readAsDataURL(f);
+}
+function toggleOverlay(){if(!ovLayer)return;document.getElementById('ov-tog').checked?ovLayer.addTo(map):map.removeLayer(ovLayer);}
+function setOvOp(){if(ovLayer)ovLayer.setOpacity(parseFloat(document.getElementById('ov-op').value));}
+
+// ══════════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════════
+function save(){try{localStorage.setItem('lp_trees',JSON.stringify(trees));}catch(e){}}
+
+function exportJSON(){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify({project:'Largo Preneste',date:new Date().toISOString(),customSpecies:SPECIES.filter(s=>s.custom),trees},null,2)],{type:'application/json'}));
+  a.download=`largo-preneste-${Date.now()}.json`;a.click();
+}
+
+function importJSON(ev){
+  const f=ev.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(d.customSpecies)d.customSpecies.forEach(s=>{if(!SPECIES.find(x=>x.code===s.code)){SPECIES.push({...s,custom:true});active.add(s.code);}});
+      Object.values(mrkrs).forEach(({m})=>map.removeLayer(m));mrkrs={};
+      trees=d.trees||d;trees.forEach(t=>putMarker(t));save();renderSidebar();
+    }catch(err){alert('File JSON non valido');}
+  };r.readAsText(f);ev.target.value='';
+}
+
+function openClearModal(){
+  document.getElementById('clear-count').textContent=trees.length;
+  document.getElementById('clear-input').value='';
+  document.getElementById('clear-confirm-btn').disabled=true;
+  document.getElementById('clear-confirm-btn').style.opacity='.4';
+  document.getElementById('clear-confirm-btn').style.cursor='not-allowed';
+  document.getElementById('clear-modal').classList.add('on');
+  setTimeout(()=>document.getElementById('clear-input').focus(),100);
+}
+function closeClearModal(){
+  document.getElementById('clear-modal').classList.remove('on');
+}
+function checkClearInput(){
+  const ok=document.getElementById('clear-input').value.trim().toUpperCase()==='CANCELLA';
+  const btn=document.getElementById('clear-confirm-btn');
+  btn.disabled=!ok;
+  btn.style.opacity=ok?'1':'.4';
+  btn.style.cursor=ok?'pointer':'not-allowed';
+}
+function executeClear(){
+  if(document.getElementById('clear-input').value.trim().toUpperCase()!=='CANCELLA') return;
+  Object.values(mrkrs).forEach(({m})=>map.removeLayer(m));mrkrs={};
+  trees=[];save();renderSidebar();
+  closeClearModal();
+}
+
+// ══════════════════════════════════════════════
+// NEW SPECIES
+// ══════════════════════════════════════════════
+function openNewSp(){
+  ['nsp-code','nsp-name','nsp-sci','nsp-fam','nsp-note'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('nsp-color').value='#3d8b5a';
+  document.getElementById('nsp-sym').value='circle';
+  updateNspPrev();
+  document.getElementById('nsp-modal').classList.add('on');
+}
+function updateNspPrev(){
+  const c=document.getElementById('nsp-color').value,sym=document.getElementById('nsp-sym').value;
+  const nm=document.getElementById('nsp-name').value||'—';
+  const ico=document.getElementById('nsp-ico-prev');
+  const r=sym==='square'?'3px':'50%';
+  if(sym==='triangle') ico.innerHTML=`<div style="width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-bottom:15px solid ${c};"></div>`;
+  else if(sym==='star') ico.innerHTML=`<span style="color:${c};font-size:16px;">★</span>`;
+  else ico.innerHTML=`<div style="width:18px;height:18px;background:${c};border-radius:${r};"></div>`;
+  document.getElementById('nsp-nm-prev').textContent=nm;
+}
+['nsp-color','nsp-sym','nsp-name'].forEach(id=>document.getElementById(id).addEventListener('input',updateNspPrev));
+function saveNewSp(){
+  const code=document.getElementById('nsp-code').value.trim().toUpperCase();
+  const name=document.getElementById('nsp-name').value.trim();
+  if(!code||!name){alert('Codice e nome sono obbligatori.');return;}
+  if(SPECIES.find(s=>s.code===code)){alert(`Codice "${code}" gia esistente.`);return;}
+  const ns={code,name,color:document.getElementById('nsp-color').value,sym:document.getElementById('nsp-sym').value,
+    sci:document.getElementById('nsp-sci').value.trim(),fam:document.getElementById('nsp-fam').value.trim(),
+    note:document.getElementById('nsp-note').value.trim(),custom:true};
+  SPECIES.push(ns);active.add(code);
+  try{localStorage.setItem('lp_custom',JSON.stringify(SPECIES.filter(s=>s.custom)));}catch(e){}
+  document.getElementById('nsp-modal').classList.remove('on');
+  renderSidebar(document.getElementById('si').value);
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+map=L.map('map',{zoomControl:true}).setView([41.8879,12.5444],18);
+const osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:22,maxNativeZoom:19}).addTo(map);
+const sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:22,maxNativeZoom:19});
+L.control.layers({'🗺 Mappa':osm,'🛰 Satellite':sat},{},{position:'topright'}).addTo(map);
+map.on('click',e=>{if(!addMode)return;openSpModal('+ Aggiungi albero',`${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`,'Aggiungi',e.latlng,null);});
+
+try{const cs=localStorage.getItem('lp_custom');if(cs)JSON.parse(cs).forEach(s=>{if(!SPECIES.find(x=>x.code===s.code)){SPECIES.push(s);active.add(s.code);}});}catch(e){}
+try{const d=localStorage.getItem('lp_trees');trees=d?JSON.parse(d):null;}catch(e){trees=null;}
+if(!trees||!trees.length) trees=INIT.map(t=>({...t}));
+trees.forEach(t=>putMarker(t));
+renderSidebar();
+</script>
+
+<!-- CLEAR CONFIRM MODAL -->
+<div class="modal-bg" id="clear-modal">
+  <div class="modal-box" style="max-width:360px">
+    <h2 style="color:var(--danger)">⚠ Cancella tutti i dati</h2>
+    <div class="modal-sub">Questa azione è irreversibile</div>
+    <p style="font-size:11px;color:var(--text);line-height:1.7;margin-bottom:14px;">
+      Stai per eliminare <strong id="clear-count" style="color:var(--danger)">0</strong> alberi dalla mappa.<br>
+      I dati non potranno essere recuperati.<br><br>
+      Per confermare, scrivi <strong style="color:var(--accent);letter-spacing:1px;">CANCELLA</strong> nel campo:
+    </p>
+    <input id="clear-input" type="text" placeholder="scrivi CANCELLA per confermare"
+      style="width:100%;background:var(--bg);border:1px solid var(--danger);border-radius:6px;
+             padding:9px;color:var(--text);font-size:12px;font-family:inherit;outline:none;margin-bottom:14px;text-align:center;letter-spacing:1px"
+      oninput="checkClearInput()"/>
+    <div class="modal-btns">
+      <button class="btn btn-s" onclick="closeClearModal()">Annulla</button>
+      <button class="btn btn-d" id="clear-confirm-btn" disabled
+        style="opacity:.4;cursor:not-allowed" onclick="executeClear()">
+        Elimina tutto
+      </button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
