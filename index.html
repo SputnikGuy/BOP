@@ -196,6 +196,7 @@ body{font-family:"DM Mono",monospace;background:var(--bg);color:var(--text);heig
 </div>
 
 <script type="module">
+// v4 - cache bust
 // ── FIREBASE MODULAR SDK ─────────────────────
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import {
@@ -384,7 +385,7 @@ async function addFromPhoto(ev){
   EXIF.getData(file,function(){
     const la=EXIF.getTag(this,"GPSLatitude"),lr=EXIF.getTag(this,"GPSLatitudeRef");
     const lo=EXIF.getTag(this,"GPSLongitude"),lor=EXIF.getTag(this,"GPSLongitudeRef");
-    if(!la||!lo){if(confirm("Nessun GPS nella foto.\nVuoi usare la posizione GPS attuale?"))useGPS();return;}
+    if(!la||!lo){if(confirm("Nessun GPS nella foto. Usare la posizione GPS attuale?"))useGPS();return;}
     const n=v=>typeof v==="object"&&v!==null?v.numerator/v.denominator:v;
     const d=a=>n(a[0])+n(a[1])/60+n(a[2])/3600;
     let lat=d(la),lng=d(lo);
@@ -528,33 +529,46 @@ const sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Worl
 L.control.layers({"🗺 Mappa":osm,"🛰 Satellite":sat},{},{position:"topright"}).addTo(map);
 map.on("click",e=>{if(!addMode)return;pendingPhoto=null;openSpModal("+ Aggiungi albero",`${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`,"Aggiungi",e.latlng,null);});
 
-// ── FIRESTORE LISTENER ───────────────────────
-let firstLoad=true;
-onSnapshot(COL(), async snapshot=>{
-  if(snapshot.empty && firstLoad){
-    firstLoad=false;
-    setSync("","Prima configurazione...");
-    $("load-msg").textContent="Caricamento dati iniziali...";
-    const batch=writeBatch(db);
-    INIT.forEach(({id,...data})=>batch.set(DOC(id),data));
-    await batch.commit();
+// ── FIRESTORE INIT + LISTENER ────────────────
+// Step 1: one-time fetch to check if collection is truly empty
+// This avoids the race condition where onSnapshot fires empty before data arrives
+async function startApp(){
+  try{
+    setSync("","Connessione...");
+    const check = await getDocs(COL());
+    if(check.empty){
+      // Genuine first install: write initial trees
+      setSync("","Prima configurazione...");
+      $("load-msg").textContent="Caricamento dati iniziali...";
+      const batch=writeBatch(db);
+      INIT.forEach(({id,...data})=>batch.set(DOC(id),data));
+      await batch.commit();
+    }
+  }catch(e){
+    setSync("err","Errore connessione: "+e.code);
+    $("load-msg").textContent="Errore: "+e.code;
+    hideLoader();
     return;
   }
-  firstLoad=false;
-  snapshot.docChanges().forEach(change=>{
-    const id=change.doc.id,t=change.doc.data();
-    if(change.type==="added"||change.type==="modified") putMarker(id,t);
-    if(change.type==="removed") removeMarker(id);
+
+  // Step 2: start realtime listener (only AFTER confirmed initial check)
+  onSnapshot(COL(), snapshot=>{
+    snapshot.docChanges().forEach(change=>{
+      const id=change.doc.id,t=change.doc.data();
+      if(change.type==="added"||change.type==="modified") putMarker(id,t);
+      if(change.type==="removed") removeMarker(id);
+    });
+    renderSidebar($("si").value);
+    setSync("ok","Sincronizzato");
+    hideLoader();
+  },err=>{
+    console.error("Firestore error:",err);
+    setSync("err","Errore: "+err.code);
+    hideLoader();
   });
-  renderSidebar($("si").value);
-  setSync("ok","Sincronizzato");
-  hideLoader();
-},err=>{
-  console.error("Firestore error:",err);
-  setSync("err","Errore: "+err.code);
-  $("load-msg").textContent="Errore connessione: "+err.code;
-  hideLoader();
-});
+}
+
+startApp();
 </script>
 </body>
 </html>
