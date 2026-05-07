@@ -7,16 +7,14 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:wght@300;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--bg:#0d1a0f;--panel:#111f13;--b1:#1e3321;--b2:#2a4a2e;--accent:#7cc47e;--a2:#b5e48c;--text:#d4e8c2;--muted:#5a7a5e;--danger:#c0392b;--warn:#e67e22;--sb:280px}
-body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);height:100dvh;display:flex;overflow:hidden}
+body{font-family:"DM Mono",monospace;background:var(--bg);color:var(--text);height:100dvh;display:flex;overflow:hidden}
 #sb{width:var(--sb);background:var(--panel);border-right:1px solid var(--b1);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:transform .25s ease;z-index:500}
 #sb-head{padding:13px 15px 10px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between}
-#sb-head-text h1{font-family:'Fraunces',serif;font-size:17px;color:var(--accent);font-weight:600}
+#sb-head-text h1{font-family:"Fraunces",serif;font-size:17px;color:var(--accent);font-weight:600}
 #sb-head-text p{font-size:9px;color:var(--muted);margin-top:2px;letter-spacing:1.5px;text-transform:uppercase}
 #sb-close{display:none;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:2px 8px}
 #sb-stats{display:flex;gap:14px;padding:7px 15px;border-bottom:1px solid var(--b1);font-size:10px;color:var(--muted)}
@@ -46,19 +44,18 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);heig
 #mw{flex:1;position:relative;min-width:0}
 #map{width:100%;height:100%}
 #tb{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:1000;background:rgba(13,26,15,.93);border:1px solid var(--b1);border-radius:22px;padding:5px 12px;display:flex;align-items:center;gap:8px;font-size:11px;backdrop-filter:blur(10px);white-space:nowrap;max-width:calc(100vw - 20px)}
-#menu-btn{display:none;background:none;border:none;color:var(--accent);font-size:18px;cursor:pointer;padding:2px 6px;line-height:1}
+#menu-btn{display:none;background:none;border:none;color:var(--accent);font-size:18px;cursor:pointer;padding:2px 6px}
 #add-btn{background:var(--b1);border:none;border-radius:12px;padding:5px 12px;color:var(--text);font-family:inherit;font-size:11px;cursor:pointer;transition:all .15s;touch-action:manipulation}
 #add-btn.on{background:var(--accent);color:var(--bg);font-weight:500}
 .tb-btn{background:var(--b1);border:none;border-radius:12px;padding:5px 12px;color:var(--text);font-family:inherit;font-size:11px;cursor:pointer;touch-action:manipulation}
 .tb-btn:hover,.tb-btn:active{background:var(--b2)}
 .tbdiv{color:var(--b2)}
-#tb-lbl{color:var(--muted);font-size:10px;max-width:160px;overflow:hidden;text-overflow:ellipsis}
 #gps-fab{display:none;position:absolute;bottom:90px;right:12px;z-index:1000;width:52px;height:52px;border-radius:50%;background:var(--accent);color:var(--bg);border:none;font-size:22px;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.4);align-items:center;justify-content:center;touch-action:manipulation}
 #sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400}
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:2000;align-items:flex-end;justify-content:center}
 .modal-bg.on{display:flex}
 .modal-box{background:var(--panel);border:1px solid var(--b1);border-radius:12px 12px 0 0;padding:20px;width:100%;max-width:500px;max-height:90dvh;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.modal-box h2{font-family:'Fraunces',serif;font-size:16px;color:var(--accent);margin-bottom:4px}
+.modal-box h2{font-family:"Fraunces",serif;font-size:16px;color:var(--accent);margin-bottom:4px}
 .modal-sub{font-size:9px;color:var(--muted);margin-bottom:14px;letter-spacing:.5px}
 #sp-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;max-height:50dvh;overflow-y:auto;margin-bottom:14px;-webkit-overflow-scrolling:touch}
 .sp-opt{display:flex;align-items:center;gap:8px;padding:9px;border:1px solid var(--b1);border-radius:7px;cursor:pointer;transition:all .12s;touch-action:manipulation}
@@ -71,27 +68,25 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);heig
 #nsp-form input,#nsp-form select{background:var(--bg);border:1px solid var(--b1);border-radius:5px;padding:8px 9px;color:var(--text);font-size:11px;font-family:inherit;outline:none;width:100%}
 .form-row{display:flex;gap:8px}
 .form-col{display:flex;flex-direction:column;gap:4px;flex:1}
-/* Loading overlay */
 #loading{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .4s}
 #loading.hide{opacity:0;pointer-events:none}
-#loading h2{font-family:'Fraunces',serif;color:var(--accent);font-size:20px}
+#loading h2{font-family:"Fraunces",serif;color:var(--accent);font-size:20px}
 #loading p{color:var(--muted);font-size:11px}
-.spinner{width:32px;height:32px;border:3px solid var(--b1);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite}
+.spinner{width:32px;height:32px;border:3px solid var(--b1);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-/* Popup */
 .leaflet-popup-content-wrapper{background:#0d1a0f!important;border:1px solid #1e3321!important;border-radius:9px!important;color:#d4e8c2!important;box-shadow:0 4px 20px rgba(0,0,0,.5)!important}
 .leaflet-popup-tip{background:#0d1a0f!important}
-.leaflet-control-layers{background:#111f13!important;border:1px solid #1e3321!important;color:#d4e8c2!important;font-family:'DM Mono',monospace!important;font-size:11px!important}
+.leaflet-control-layers{background:#111f13!important;border:1px solid #1e3321!important;color:#d4e8c2!important;font-family:"DM Mono",monospace!important;font-size:11px!important}
 .leaflet-control-layers label{color:#d4e8c2!important}
-.pop{font-family:'DM Mono',monospace;font-size:11px;line-height:1.65;max-width:260px}
-.pop-name{font-family:'Fraunces',serif;font-size:14px;color:var(--accent);font-weight:600}
+.pop{font-family:"DM Mono",monospace;font-size:11px;line-height:1.65;max-width:260px}
+.pop-name{font-family:"Fraunces",serif;font-size:14px;color:var(--accent);font-weight:600}
 .pop-sci{font-style:italic;color:var(--muted);font-size:10px;margin-bottom:4px}
 .pop-fam{font-size:9px;color:var(--b2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
 .pop-note{font-size:10px;color:#aac8a0;line-height:1.5;margin-bottom:8px;border-left:2px solid var(--b2);padding-left:7px}
 .pop-meta{font-size:9px;color:var(--muted);margin-bottom:8px}
 .pop-prov{font-size:9px;color:var(--warn);margin-bottom:6px;background:rgba(230,126,34,.12);padding:3px 6px;border-radius:3px}
 .pop-btns{display:flex;gap:6px;flex-wrap:wrap}
-.pb{padding:6px 10px;border:none;border-radius:4px;cursor:pointer;font-size:10px;font-family:'DM Mono',monospace;touch-action:manipulation}
+.pb{padding:6px 10px;border:none;border-radius:4px;cursor:pointer;font-size:10px;font-family:"DM Mono",monospace;touch-action:manipulation}
 .pb-mod{background:var(--b2);color:var(--text)}
 .pb-del{background:var(--danger);color:#fff}
 @media(max-width:640px){
@@ -101,141 +96,114 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);heig
   #sb-close{display:block}
   #sb-overlay.on{display:block}
   #menu-btn{display:block}
-  #tb-lbl{display:none}
-  .tbdiv{display:none}
   #gps-fab{display:flex}
 }
-@media(min-width:641px){
-  .modal-bg{align-items:center}
-  .modal-box{border-radius:12px;max-height:85dvh}
-}
+@media(min-width:641px){.modal-bg{align-items:center}.modal-box{border-radius:12px;max-height:85dvh}}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--b1);border-radius:3px}
 </style>
 </head>
 <body>
-
-<div id="loading">
-  <div class="spinner"></div>
-  <h2>🌿 Largo Preneste</h2>
-  <p>Connessione al database...</p>
-</div>
-
-<div id="sb-overlay" onclick="closeSb()"></div>
+<div id="loading"><div class="spinner"></div><h2>🌿 Largo Preneste</h2><p id="load-msg">Connessione al database...</p></div>
+<div id="sb-overlay" onclick="W.closeSb()"></div>
 <div id="sb">
   <div id="sb-head">
-    <div id="sb-head-text">
-      <h1>🌿 Largo Preneste</h1>
-      <p>Riforestazione Urbana · Roma</p>
-    </div>
-    <button id="sb-close" onclick="closeSb()">×</button>
+    <div id="sb-head-text"><h1>🌿 Largo Preneste</h1><p>Riforestazione Urbana · Roma</p></div>
+    <button id="sb-close" onclick="W.closeSb()">×</button>
   </div>
-  <div id="sb-stats">
-    <span>Alberi: <strong id="tot">0</strong></span>
-    <span>Specie: <strong id="sp-vis">40</strong></span>
-  </div>
-  <div id="sync-status">
-    <div id="sync-dot"></div>
-    <span id="sync-label">Connessione...</span>
-  </div>
-  <div id="sb-search"><input id="si" type="text" placeholder="🔍 cerca specie..."/></div>
+  <div id="sb-stats"><span>Alberi: <strong id="tot">0</strong></span><span>Specie: <strong id="sp-vis">40</strong></span></div>
+  <div id="sync-status"><div id="sync-dot"></div><span id="sync-label">Connessione...</span></div>
+  <div id="sb-search"><input id="si" type="text" placeholder="🔍 cerca specie..." oninput="W.filterSp(this.value)"/></div>
   <div id="sp-list"></div>
   <div id="sb-foot">
     <div class="btn-row">
-      <button class="btn btn-s" style="flex:1" onclick="exportJSON()">↑ Esporta JSON</button>
+      <button class="btn btn-s" style="flex:1" onclick="W.exportJSON()">↑ Esporta</button>
       <button class="btn btn-s" style="flex:1" onclick="document.getElementById('imp').click()">↓ Importa</button>
-      <input type="file" id="imp" accept=".json" style="display:none" onchange="importJSON(event)">
+      <input type="file" id="imp" accept=".json" style="display:none" onchange="W.importJSON(event)">
     </div>
-    <button class="btn btn-s" onclick="openNewSp()">＋ Nuova specie</button>
-    <button class="btn btn-d" style="font-size:10px" onclick="openClearModal()">✕ Cancella tutti i dati</button>
+    <button class="btn btn-s" onclick="W.openNewSp()">＋ Nuova specie</button>
+    <button class="btn btn-d" style="font-size:10px" onclick="W.openClearModal()">✕ Cancella tutti i dati</button>
   </div>
 </div>
-
 <div id="mw">
   <div id="tb">
-    <button id="menu-btn" onclick="openSb()">☰</button>
-    <button id="add-btn" onclick="toggleAdd()">＋ Aggiungi</button>
+    <button id="menu-btn" onclick="W.openSb()">☰</button>
+    <button id="add-btn" onclick="W.toggleAdd()">＋ Aggiungi</button>
     <span class="tbdiv">|</span>
-    <button class="tb-btn" onclick="useCurrentGPS()">📍 GPS</button>
+    <button class="tb-btn" onclick="W.useGPS()">📍 GPS</button>
     <button class="tb-btn" onclick="document.getElementById('photo-in').click()">📷 Foto</button>
-    <input type="file" id="photo-in" accept="image/*" style="display:none" onchange="addFromPhoto(event)">
-    <span class="tbdiv">|</span>
-    <span id="tb-lbl">seleziona modalità</span>
+    <input type="file" id="photo-in" accept="image/*" style="display:none" onchange="W.addFromPhoto(event)">
   </div>
   <div id="map"></div>
-  <button id="gps-fab" onclick="useCurrentGPS()">📍</button>
+  <button id="gps-fab" onclick="W.useGPS()">📍</button>
 </div>
 
-<!-- SPECIES MODAL -->
+<!-- MODALS -->
 <div class="modal-bg" id="sp-modal">
   <div class="modal-box">
     <h2 id="sp-modal-title">Aggiungi albero</h2>
     <div class="modal-sub" id="sp-modal-sub"></div>
     <div id="sp-grid"></div>
     <div class="modal-btns">
-      <button class="btn btn-s" onclick="closeSpModal()">Annulla</button>
-      <button class="btn btn-p" id="sp-modal-ok" onclick="confirmSp()">Aggiungi</button>
+      <button class="btn btn-s" onclick="W.closeSpModal()">Annulla</button>
+      <button class="btn btn-p" id="sp-modal-ok" onclick="W.confirmSp()">Aggiungi</button>
     </div>
   </div>
 </div>
-
-<!-- NEW SPECIES MODAL -->
 <div class="modal-bg" id="nsp-modal">
   <div class="modal-box" style="max-width:400px">
     <h2>Nuova specie</h2>
-    <div class="modal-sub">Aggiungi una specie non presente nell'elenco</div>
+    <div class="modal-sub">Aggiungi una specie non presente</div>
     <div id="nsp-form">
       <div class="form-row">
-        <div class="form-col"><label>Codice (2-4 car.)</label><input id="nsp-code" type="text" maxlength="4" placeholder="es. Fp"/></div>
+        <div class="form-col"><label>Codice</label><input id="nsp-code" type="text" maxlength="4" placeholder="es. Fp"/></div>
         <div class="form-col"><label>Simbolo</label>
-          <select id="nsp-sym">
-            <option value="circle">● Cerchio</option>
-            <option value="square">■ Quadrato</option>
-            <option value="triangle">▲ Triangolo</option>
-            <option value="star">★ Stella</option>
+          <select id="nsp-sym" onchange="W.updateNspPrev()">
+            <option value="circle">● Cerchio</option><option value="square">■ Quadrato</option>
+            <option value="triangle">▲ Triangolo</option><option value="star">★ Stella</option>
           </select>
         </div>
       </div>
-      <div class="form-col"><label>Nome comune</label><input id="nsp-name" type="text" placeholder="es. Fico Pagliaio"/></div>
-      <div class="form-col"><label>Nome scientifico (opz.)</label><input id="nsp-sci" type="text" placeholder="es. Ficus carica"/></div>
-      <div class="form-col"><label>Famiglia (opz.)</label><input id="nsp-fam" type="text" placeholder="es. Moraceae"/></div>
-      <div class="form-col"><label>Nota ecologica (opz.)</label><input id="nsp-note" type="text" placeholder="breve descrizione..."/></div>
+      <div class="form-col"><label>Nome comune</label><input id="nsp-name" type="text" oninput="W.updateNspPrev()"/></div>
+      <div class="form-col"><label>Nome scientifico (opz.)</label><input id="nsp-sci" type="text"/></div>
+      <div class="form-col"><label>Famiglia (opz.)</label><input id="nsp-fam" type="text"/></div>
+      <div class="form-col"><label>Nota ecologica (opz.)</label><input id="nsp-note" type="text"/></div>
       <div class="form-row" style="align-items:flex-end;gap:10px">
-        <div class="form-col"><label>Colore</label><input id="nsp-color" type="color" value="#3d8b5a" style="height:38px;width:100%;cursor:pointer;border-radius:5px;border:1px solid var(--b1);padding:2px"/></div>
-        <div style="flex:1;display:flex;align-items:center;gap:8px;font-size:11px;padding-bottom:4px">
-          <span id="nsp-ico-prev"></span><span id="nsp-nm-prev" style="color:var(--text)">—</span>
-        </div>
+        <div class="form-col"><label>Colore</label><input id="nsp-color" type="color" value="#3d8b5a" onchange="W.updateNspPrev()" style="height:38px;width:100%;cursor:pointer;border-radius:5px;border:1px solid var(--b1);padding:2px"/></div>
+        <div style="flex:1;display:flex;align-items:center;gap:8px;font-size:11px;padding-bottom:4px"><span id="nsp-ico-prev"></span><span id="nsp-nm-prev">—</span></div>
       </div>
     </div>
     <div class="modal-btns" style="margin-top:14px">
       <button class="btn btn-s" onclick="document.getElementById('nsp-modal').classList.remove('on')">Annulla</button>
-      <button class="btn btn-p" onclick="saveNewSp()">Salva specie ✓</button>
+      <button class="btn btn-p" onclick="W.saveNewSp()">Salva ✓</button>
     </div>
   </div>
 </div>
-
-<!-- CLEAR CONFIRM MODAL -->
 <div class="modal-bg" id="clear-modal">
   <div class="modal-box" style="max-width:360px">
     <h2 style="color:var(--danger)">⚠ Cancella tutti i dati</h2>
-    <div class="modal-sub">Questa azione è irreversibile e cancella il database per tutti i dispositivi</div>
+    <div class="modal-sub">Azione irreversibile su tutti i dispositivi</div>
     <p style="font-size:11px;color:var(--text);line-height:1.7;margin-bottom:14px;">
-      Stai per eliminare <strong id="clear-count" style="color:var(--danger)">0</strong> alberi.<br><br>
-      Scrivi <strong style="color:var(--accent);letter-spacing:1px;">CANCELLA</strong> per confermare:
+      Stai per eliminare <strong id="clear-count" style="color:var(--danger)">0</strong> alberi.<br>
+      Scrivi <strong style="color:var(--accent)">CANCELLA</strong> per confermare:
     </p>
-    <input id="clear-input" type="text" placeholder="scrivi CANCELLA"
-      style="width:100%;background:var(--bg);border:1px solid var(--danger);border-radius:6px;padding:9px;color:var(--text);font-size:12px;font-family:inherit;outline:none;margin-bottom:14px;text-align:center;letter-spacing:1px"
-      oninput="checkClearInput()"/>
+    <input id="clear-input" type="text" placeholder="scrivi CANCELLA" oninput="W.checkClear()"
+      style="width:100%;background:var(--bg);border:1px solid var(--danger);border-radius:6px;padding:9px;color:var(--text);font-size:12px;font-family:inherit;outline:none;margin-bottom:14px;text-align:center;letter-spacing:1px"/>
     <div class="modal-btns">
-      <button class="btn btn-s" onclick="closeClearModal()">Annulla</button>
-      <button class="btn btn-d" id="clear-ok" disabled style="opacity:.4;cursor:not-allowed" onclick="executeClear()">Elimina tutto</button>
+      <button class="btn btn-s" onclick="W.closeClearModal()">Annulla</button>
+      <button class="btn btn-d" id="clear-ok" disabled style="opacity:.4;cursor:not-allowed" onclick="W.executeClear()">Elimina tutto</button>
     </div>
   </div>
 </div>
 
-<script>
-// ══════════════════════════════════════════════
-// FIREBASE CONFIG
-// ══════════════════════════════════════════════
+<script type="module">
+// ── FIREBASE MODULAR SDK ─────────────────────
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import {
+  getFirestore, collection, doc,
+  addDoc, setDoc, updateDoc, deleteDoc,
+  onSnapshot, getDocs, writeBatch
+} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyDUmQANUdOn7pzRtlMkbEA6yKw7rRJMQ5o",
   authDomain: "bop-riforestazione.firebaseapp.com",
@@ -244,512 +212,349 @@ const firebaseConfig = {
   messagingSenderId: "325641620025",
   appId: "1:325641620025:web:99de682e4e5a1ce6dfdbe8"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+const COL = () => collection(db, "trees");
+const DOC = id => doc(db, "trees", id);
 
-// ══════════════════════════════════════════════
-// SPECIES
-// ══════════════════════════════════════════════
+// ── SPECIES ──────────────────────────────────
 let SPECIES=[
-{code:'Cn',name:'Carpino Nero',color:'#3d8b5a',sym:'circle',sci:'Ostrya carpinifolia',fam:'Betulaceae',note:'Pioniere dei boschi secchi calcarei. Legno durissimo. Ottimo per fauna.'},
-{code:'Pe',name:'Pero',color:'#95d5b2',sym:'circle',sci:'Pyrus communis',fam:'Rosaceae',note:'Fruttifero caducifoglio. Fiorisce a marzo, fondamentale per impollinatori.'},
-{code:'Pr',name:'Perasto',color:'#74c69d',sym:'circle',sci:'Pyrus pyraster',fam:'Rosaceae',note:'Pero selvatico autoctono, antenato dei peri coltivati. Longevo e resistente.'},
-{code:'N',name:'Nocciolo',color:'#b7e4c7',sym:'circle',sci:'Corylus avellana',fam:'Betulaceae',note:'Prima specie a fiorire (gennaio). Nocciole eduli, habitat per uccelli.'},
-{code:'Ti',name:'Tiglio',color:'#52b788',sym:'circle',sci:'Tilia cordata',fam:'Malvaceae',note:'Grande ombreggiante. Fioritura giugno-luglio mellifera e profumatissima.'},
-{code:'PN',name:'Pioppo Nero',color:'#40916c',sym:'circle',sci:'Populus nigra',fam:'Salicaceae',note:'Pioniere ripariale a crescita rapida. Ottimo per fitorimedio e CO2.'},
-{code:'Ab',name:'Abele',color:'#adb5bd',sym:'circle',sci:'Populus alba',fam:'Salicaceae',note:'Pioppo bianco, foglie argentee. Preferisce suoli umidi, cresce veloce.'},
-{code:'U',name:'Ulivo',color:'#a8c686',sym:'circle',sci:'Olea europaea',fam:'Oleaceae',note:'Simbolo del Mediterraneo. Vive millenni, edule, importante per biodiversita.'},
-{code:'Ov',name:'Olivastro',color:'#70a288',sym:'circle',sci:'Olea europaea sylvestris',fam:'Oleaceae',note:'Forma selvatica autoctona. Piu resistente e resiliente alla siccita.'},
-{code:'Ar',name:'Albicocco',color:'#f4a261',sym:'circle',sci:'Prunus armeniaca',fam:'Rosaceae',note:'Fiorisce tra febbraio e marzo. Frutti ricchi di betacarotene.'},
-{code:'Li',name:'Limone',color:'#f9c74f',sym:'circle',sci:'Citrus limon',fam:'Rutaceae',note:'Sempreverde aromatico. Sensibile al gelo, necessita esposizione riparata.'},
-{code:'Ma',name:'Mandorlo',color:'#f4acb7',sym:'circle',sci:'Prunus dulcis',fam:'Rosaceae',note:'Prima pianta a fiorire (gen-feb). Annuncia la primavera. Vitamina E.'},
-{code:'Mc',name:'Melo Cotogno',color:'#e9c46a',sym:'circle',sci:'Cydonia oblonga',fam:'Rosaceae',note:'Antico fruttifero mediterraneo. Ottimo per marmellate.'},
-{code:'G',name:'Gelso',color:'#7b2d8b',sym:'circle',sci:'Morus nigra / Morus alba',fam:'Moraceae',note:'Fondamentale per biodiversita. Frutti eduli, amato da uccelli e insetti.'},
-{code:'F',name:'Fico Settembrino',color:'#6a4c93',sym:'circle',sci:'Ficus carica',fam:'Moraceae',note:'Varieta autunnale. Molto rustico, fondamentale per fauna locale.'},
-{code:'Vi',name:'Vite',color:'#7209b7',sym:'circle',sci:'Vitis vinifera',fam:'Vitaceae',note:'Liana rampicante. Grappoli eduli a fine estate.'},
-{code:'Al',name:'Albero di Giuda',color:'#e63946',sym:'circle',sci:'Cercis siliquastrum',fam:'Fabaceae',note:'Spettacolare fioritura rosa sui rami nudi (marzo-aprile).'},
-{code:'Ai',name:'Ailanto',color:'#d62828',sym:'circle',sci:'Ailanthus altissima',fam:'Simaroubaceae',note:'ATTENZIONE: specie invasiva. Monitorarne la diffusione regolarmente.'},
-{code:'Ol',name:'Olmo',color:'#457b9d',sym:'circle',sci:'Ulmus minor',fam:'Ulmaceae',note:'Grande albero autoctono, ridotto dalla grafiosi. Legno flessibile.'},
-{code:'Sa',name:'Salice',color:'#a7c957',sym:'circle',sci:'Salix sp.',fam:'Salicaceae',note:'Essenziale per fauna ripariale. Cresce veloce su suoli umidi.'},
-{code:'Q',name:'Quercia',color:'#606c38',sym:'circle',sci:'Quercus pubescens',fam:'Fagaceae',note:'Autoctona ambienti aridi. Ospita 300+ specie di insetti.'},
-{code:'Ro',name:'Rovere',color:'#8b5e3c',sym:'circle',sci:'Quercus petraea',fam:'Fagaceae',note:'Quercia da bosco, longeva e maestosa. Ghiande per fauna.'},
-{code:'Le',name:'Leccio',color:'#1b4332',sym:'square',sci:'Quercus ilex',fam:'Fagaceae',note:'Sempreverde mediterraneo per eccellenza. Resistente a siccita e fuoco.'},
-{code:'A',name:'Alloro',color:'#2a9d8f',sym:'circle',sci:'Laurus nobilis',fam:'Lauraceae',note:'Sempreverde aromatico simbolo di gloria. Bacche per merli e tordi.'},
-{code:'Mi',name:'Mirto',color:'#4cc9f0',sym:'circle',sci:'Myrtus communis',fam:'Myrtaceae',note:'Arbusto mediterraneo aromatico. Bacche eduli. Fiori melliferi.'},
-{code:'Gi',name:'Ginepro',color:'#283618',sym:'circle',sci:'Juniperus communis',fam:'Cupressaceae',note:'Arbusto pioniero su terreni poveri. Bacche aromatiche per gin.'},
-{code:'Pg',name:'Prugnolo',color:'#1d3557',sym:'circle',sci:'Prunus spinosa',fam:'Rosaceae',note:'Arbusto spinoso, siepi impenetrabili. Bacche per marmellate.'},
-{code:'Rc',name:'Rosa Canina',color:'#e9c46a',sym:'circle',sci:'Rosa canina',fam:'Rosaceae',note:'Rosa selvatica autoctona. Cinorrodi ricchi di vitamina C.'},
-{code:'Ros',name:'Rosa',color:'#e76f51',sym:'circle',sci:'Rosa sp.',fam:'Rosaceae',note:'Arbusto ornamentale. Fiori profumati e melliferi.'},
-{code:'B',name:'Biancospino',color:'#d8f3dc',sym:'square',sci:'Crataegus monogyna',fam:'Rosaceae',note:'Siepe difensiva naturale. Bacche rosse per uccelli migratori.'},
-{code:'Vib',name:'Viburno',color:'#fb8500',sym:'circle',sci:'Viburnum tinus',fam:'Adoxaceae',note:'Sempreverde ornamentale. Fiorisce in inverno. Bacche per uccelli.'},
-{code:'Lig',name:'Ligustro',color:'#023047',sym:'triangle',sci:'Ligustrum vulgare',fam:'Oleaceae',note:'Arbusto autoctono da siepe. Bacche fondamentali per uccelli migratori.'},
-{code:'Ac',name:'Robinia/Acacia',color:'#ffb703',sym:'star',sci:'Robinia pseudoacacia',fam:'Fabaceae',note:'Azotofissatrice, migliora il suolo. Ottima per api a maggio.'},
-{code:'Ne',name:'Nespolo',color:'#f48c06',sym:'circle',sci:'Mespilus germanica',fam:'Rosaceae',note:'Antico fruttifero medievale. Frutto edule dopo le gelate.'},
-{code:'Bag',name:'Bagolino',color:'#8ecae6',sym:'circle',sci:'Celtis australis',fam:'Cannabaceae',note:'Bagolaro, albero da ombra. Drupe eduli per uccelli. Resistente al caldo.'},
-{code:'Bp',name:'Baretto del Prete',color:'#6d6875',sym:'circle',sci:'Euonymus europaeus',fam:'Celastraceae',note:'Margini boschivi. Frutti rosa vistosi in autunno.'},
-{code:'Ci',name:'Cipresso',color:'#386641',sym:'circle',sci:'Cupressus sempervirens',fam:'Cupressaceae',note:'Sempreverde simbolo italiano. Frangivento. Vive sino a 1000 anni.'},
-{code:'Or',name:'Orniello',color:'#ffd60a',sym:'circle',sci:'Fraxinus ornus',fam:'Oleaceae',note:'Frassino da manna. Fioritura bianca in maggio. Autoctono calcareo.'},
-{code:'Lo',name:'Lavanda',color:'#9b72cf',sym:'circle',sci:'Lavandula angustifolia',fam:'Lamiaceae',note:'Aromatica mellifera. Fiorisce giugno-luglio. Repellente naturale.'},
-{code:'Sd',name:'Sedice/Verbasco',color:'#d4e09b',sym:'circle',sci:'Verbascum thapsus',fam:'Scrophulariaceae',note:'Biennale pioniera fino a 2m. Foglie fitoterapiche. Fiori gialli.'},
+{code:"Cn",name:"Carpino Nero",color:"#3d8b5a",sym:"circle",sci:"Ostrya carpinifolia",fam:"Betulaceae",note:"Pioniere dei boschi secchi calcarei. Legno durissimo. Ottimo per fauna."},
+{code:"Pe",name:"Pero",color:"#95d5b2",sym:"circle",sci:"Pyrus communis",fam:"Rosaceae",note:"Fruttifero caducifoglio. Fiorisce a marzo, fondamentale per impollinatori."},
+{code:"Pr",name:"Perasto",color:"#74c69d",sym:"circle",sci:"Pyrus pyraster",fam:"Rosaceae",note:"Pero selvatico autoctono, antenato dei peri coltivati. Longevo e resistente."},
+{code:"N",name:"Nocciolo",color:"#b7e4c7",sym:"circle",sci:"Corylus avellana",fam:"Betulaceae",note:"Prima specie a fiorire (gennaio). Nocciole eduli, habitat per uccelli."},
+{code:"Ti",name:"Tiglio",color:"#52b788",sym:"circle",sci:"Tilia cordata",fam:"Malvaceae",note:"Grande ombreggiante. Fioritura giugno-luglio mellifera e profumatissima."},
+{code:"PN",name:"Pioppo Nero",color:"#40916c",sym:"circle",sci:"Populus nigra",fam:"Salicaceae",note:"Pioniere ripariale a crescita rapida. Ottimo per fitorimedio e CO2."},
+{code:"Ab",name:"Abele",color:"#adb5bd",sym:"circle",sci:"Populus alba",fam:"Salicaceae",note:"Pioppo bianco, foglie argentee. Preferisce suoli umidi, cresce veloce."},
+{code:"U",name:"Ulivo",color:"#a8c686",sym:"circle",sci:"Olea europaea",fam:"Oleaceae",note:"Simbolo del Mediterraneo. Vive millenni, edule, importante per biodiversita."},
+{code:"Ov",name:"Olivastro",color:"#70a288",sym:"circle",sci:"Olea europaea sylvestris",fam:"Oleaceae",note:"Forma selvatica autoctona. Piu resistente e resiliente alla siccita."},
+{code:"Ar",name:"Albicocco",color:"#f4a261",sym:"circle",sci:"Prunus armeniaca",fam:"Rosaceae",note:"Fiorisce tra febbraio e marzo. Frutti ricchi di betacarotene."},
+{code:"Li",name:"Limone",color:"#f9c74f",sym:"circle",sci:"Citrus limon",fam:"Rutaceae",note:"Sempreverde aromatico. Sensibile al gelo, necessita esposizione riparata."},
+{code:"Ma",name:"Mandorlo",color:"#f4acb7",sym:"circle",sci:"Prunus dulcis",fam:"Rosaceae",note:"Prima pianta a fiorire (gen-feb). Annuncia la primavera. Vitamina E."},
+{code:"Mc",name:"Melo Cotogno",color:"#e9c46a",sym:"circle",sci:"Cydonia oblonga",fam:"Rosaceae",note:"Antico fruttifero mediterraneo. Ottimo per marmellate."},
+{code:"G",name:"Gelso",color:"#7b2d8b",sym:"circle",sci:"Morus nigra / Morus alba",fam:"Moraceae",note:"Fondamentale per biodiversita. Frutti eduli, amato da uccelli e insetti."},
+{code:"F",name:"Fico Settembrino",color:"#6a4c93",sym:"circle",sci:"Ficus carica",fam:"Moraceae",note:"Varieta autunnale. Molto rustico, fondamentale per fauna locale."},
+{code:"Vi",name:"Vite",color:"#7209b7",sym:"circle",sci:"Vitis vinifera",fam:"Vitaceae",note:"Liana rampicante. Grappoli eduli a fine estate."},
+{code:"Al",name:"Albero di Giuda",color:"#e63946",sym:"circle",sci:"Cercis siliquastrum",fam:"Fabaceae",note:"Spettacolare fioritura rosa sui rami nudi (marzo-aprile)."},
+{code:"Ai",name:"Ailanto",color:"#d62828",sym:"circle",sci:"Ailanthus altissima",fam:"Simaroubaceae",note:"ATTENZIONE: specie invasiva. Monitorarne la diffusione regolarmente."},
+{code:"Ol",name:"Olmo",color:"#457b9d",sym:"circle",sci:"Ulmus minor",fam:"Ulmaceae",note:"Grande albero autoctono, ridotto dalla grafiosi. Legno flessibile."},
+{code:"Sa",name:"Salice",color:"#a7c957",sym:"circle",sci:"Salix sp.",fam:"Salicaceae",note:"Essenziale per fauna ripariale. Cresce veloce su suoli umidi."},
+{code:"Q",name:"Quercia",color:"#606c38",sym:"circle",sci:"Quercus pubescens",fam:"Fagaceae",note:"Autoctona ambienti aridi. Ospita 300+ specie di insetti."},
+{code:"Ro",name:"Rovere",color:"#8b5e3c",sym:"circle",sci:"Quercus petraea",fam:"Fagaceae",note:"Quercia da bosco, longeva e maestosa. Ghiande per fauna."},
+{code:"Le",name:"Leccio",color:"#1b4332",sym:"square",sci:"Quercus ilex",fam:"Fagaceae",note:"Sempreverde mediterraneo per eccellenza. Resistente a siccita e fuoco."},
+{code:"A",name:"Alloro",color:"#2a9d8f",sym:"circle",sci:"Laurus nobilis",fam:"Lauraceae",note:"Sempreverde aromatico simbolo di gloria. Bacche per merli e tordi."},
+{code:"Mi",name:"Mirto",color:"#4cc9f0",sym:"circle",sci:"Myrtus communis",fam:"Myrtaceae",note:"Arbusto mediterraneo aromatico. Bacche eduli. Fiori melliferi."},
+{code:"Gi",name:"Ginepro",color:"#283618",sym:"circle",sci:"Juniperus communis",fam:"Cupressaceae",note:"Arbusto pioniero su terreni poveri. Bacche aromatiche per gin."},
+{code:"Pg",name:"Prugnolo",color:"#1d3557",sym:"circle",sci:"Prunus spinosa",fam:"Rosaceae",note:"Arbusto spinoso, siepi impenetrabili. Bacche per marmellate."},
+{code:"Rc",name:"Rosa Canina",color:"#e9c46a",sym:"circle",sci:"Rosa canina",fam:"Rosaceae",note:"Rosa selvatica autoctona. Cinorrodi ricchi di vitamina C."},
+{code:"Ros",name:"Rosa",color:"#e76f51",sym:"circle",sci:"Rosa sp.",fam:"Rosaceae",note:"Arbusto ornamentale. Fiori profumati e melliferi."},
+{code:"B",name:"Biancospino",color:"#d8f3dc",sym:"square",sci:"Crataegus monogyna",fam:"Rosaceae",note:"Siepe difensiva naturale. Bacche rosse per uccelli migratori."},
+{code:"Vib",name:"Viburno",color:"#fb8500",sym:"circle",sci:"Viburnum tinus",fam:"Adoxaceae",note:"Sempreverde ornamentale. Fiorisce in inverno. Bacche per uccelli."},
+{code:"Lig",name:"Ligustro",color:"#023047",sym:"triangle",sci:"Ligustrum vulgare",fam:"Oleaceae",note:"Arbusto autoctono da siepe. Bacche fondamentali per uccelli migratori."},
+{code:"Ac",name:"Robinia/Acacia",color:"#ffb703",sym:"star",sci:"Robinia pseudoacacia",fam:"Fabaceae",note:"Azotofissatrice, migliora il suolo. Ottima per api a maggio."},
+{code:"Ne",name:"Nespolo",color:"#f48c06",sym:"circle",sci:"Mespilus germanica",fam:"Rosaceae",note:"Antico fruttifero medievale. Frutto edule dopo le gelate."},
+{code:"Bag",name:"Bagolino",color:"#8ecae6",sym:"circle",sci:"Celtis australis",fam:"Cannabaceae",note:"Bagolaro, albero da ombra. Drupe eduli per uccelli. Resistente al caldo."},
+{code:"Bp",name:"Baretto del Prete",color:"#6d6875",sym:"circle",sci:"Euonymus europaeus",fam:"Celastraceae",note:"Margini boschivi. Frutti rosa vistosi in autunno."},
+{code:"Ci",name:"Cipresso",color:"#386641",sym:"circle",sci:"Cupressus sempervirens",fam:"Cupressaceae",note:"Sempreverde simbolo italiano. Frangivento. Vive sino a 1000 anni."},
+{code:"Or",name:"Orniello",color:"#ffd60a",sym:"circle",sci:"Fraxinus ornus",fam:"Oleaceae",note:"Frassino da manna. Fioritura bianca in maggio. Autoctono calcareo."},
+{code:"Lo",name:"Lavanda",color:"#9b72cf",sym:"circle",sci:"Lavandula angustifolia",fam:"Lamiaceae",note:"Aromatica mellifera. Fiorisce giugno-luglio. Repellente naturale."},
+{code:"Sd",name:"Sedice/Verbasco",color:"#d4e09b",sym:"circle",sci:"Verbascum thapsus",fam:"Scrophulariaceae",note:"Biennale pioniera fino a 2m. Foglie fitoterapiche. Fiori gialli."},
 ];
 
 const INIT=[
-{id:'p01',lat:41.8898,lng:12.5432,code:'Le',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p02',lat:41.8900,lng:12.5444,code:'Q',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p03',lat:41.8896,lng:12.5426,code:'Cn',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p04',lat:41.8897,lng:12.5458,code:'Ro',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p05',lat:41.8899,lng:12.5420,code:'PN',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p06',lat:41.8894,lng:12.5450,code:'Ab',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p07',lat:41.8893,lng:12.5463,code:'N',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p08',lat:41.8888,lng:12.5438,code:'U',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p09',lat:41.8886,lng:12.5450,code:'Al',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p10',lat:41.8883,lng:12.5430,code:'Ac',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p11',lat:41.8889,lng:12.5462,code:'Bag',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p12',lat:41.8885,lng:12.5420,code:'Pr',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p13',lat:41.8882,lng:12.5465,code:'Bp',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p14',lat:41.8879,lng:12.5444,code:'A',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p15',lat:41.8878,lng:12.5434,code:'B',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p16',lat:41.8877,lng:12.5454,code:'Lig',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p17',lat:41.8881,lng:12.5418,code:'Ci',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p18',lat:41.8878,lng:12.5463,code:'Or',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p19',lat:41.8875,lng:12.5440,code:'Ol',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p20',lat:41.8872,lng:12.5450,code:'G',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p21',lat:41.8876,lng:12.5430,code:'Ne',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p22',lat:41.8873,lng:12.5460,code:'Ti',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p23',lat:41.8869,lng:12.5447,code:'F',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p24',lat:41.8868,lng:12.5435,code:'Mi',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p25',lat:41.8871,lng:12.5457,code:'Pe',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p26',lat:41.8866,lng:12.5444,code:'Rc',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p27',lat:41.8872,lng:12.5424,code:'Vib',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p28',lat:41.8868,lng:12.5460,code:'Sa',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p29',lat:41.8874,lng:12.5467,code:'Ros',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p30',lat:41.8862,lng:12.5440,code:'Ov',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p31',lat:41.8860,lng:12.5450,code:'Li',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p32',lat:41.8863,lng:12.5430,code:'Ma',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p33',lat:41.8861,lng:12.5460,code:'Vi',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p34',lat:41.8865,lng:12.5420,code:'Pg',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p35',lat:41.8858,lng:12.5443,code:'Gi',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p36',lat:41.8864,lng:12.5454,code:'Mc',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p37',lat:41.8877,lng:12.5418,code:'Lo',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p38',lat:41.8869,lng:12.5428,code:'Ar',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p39',lat:41.8863,lng:12.5467,code:'Sd',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-{id:'p40',lat:41.8884,lng:12.5436,code:'Ai',ts:'2025-03-01T09:00:00Z',prov:true,photo:null},
-];
+{id:"p01",lat:41.8898,lng:12.5432,code:"Le"},{id:"p02",lat:41.8900,lng:12.5444,code:"Q"},
+{id:"p03",lat:41.8896,lng:12.5426,code:"Cn"},{id:"p04",lat:41.8897,lng:12.5458,code:"Ro"},
+{id:"p05",lat:41.8899,lng:12.5420,code:"PN"},{id:"p06",lat:41.8894,lng:12.5450,code:"Ab"},
+{id:"p07",lat:41.8893,lng:12.5463,code:"N"}, {id:"p08",lat:41.8888,lng:12.5438,code:"U"},
+{id:"p09",lat:41.8886,lng:12.5450,code:"Al"},{id:"p10",lat:41.8883,lng:12.5430,code:"Ac"},
+{id:"p11",lat:41.8889,lng:12.5462,code:"Bag"},{id:"p12",lat:41.8885,lng:12.5420,code:"Pr"},
+{id:"p13",lat:41.8882,lng:12.5465,code:"Bp"},{id:"p14",lat:41.8879,lng:12.5444,code:"A"},
+{id:"p15",lat:41.8878,lng:12.5434,code:"B"}, {id:"p16",lat:41.8877,lng:12.5454,code:"Lig"},
+{id:"p17",lat:41.8881,lng:12.5418,code:"Ci"},{id:"p18",lat:41.8878,lng:12.5463,code:"Or"},
+{id:"p19",lat:41.8875,lng:12.5440,code:"Ol"},{id:"p20",lat:41.8872,lng:12.5450,code:"G"},
+{id:"p21",lat:41.8876,lng:12.5430,code:"Ne"},{id:"p22",lat:41.8873,lng:12.5460,code:"Ti"},
+{id:"p23",lat:41.8869,lng:12.5447,code:"F"}, {id:"p24",lat:41.8868,lng:12.5435,code:"Mi"},
+{id:"p25",lat:41.8871,lng:12.5457,code:"Pe"},{id:"p26",lat:41.8866,lng:12.5444,code:"Rc"},
+{id:"p27",lat:41.8872,lng:12.5424,code:"Vib"},{id:"p28",lat:41.8868,lng:12.5460,code:"Sa"},
+{id:"p29",lat:41.8874,lng:12.5467,code:"Ros"},{id:"p30",lat:41.8862,lng:12.5440,code:"Ov"},
+{id:"p31",lat:41.8860,lng:12.5450,code:"Li"},{id:"p32",lat:41.8863,lng:12.5430,code:"Ma"},
+{id:"p33",lat:41.8861,lng:12.5460,code:"Vi"},{id:"p34",lat:41.8865,lng:12.5420,code:"Pg"},
+{id:"p35",lat:41.8858,lng:12.5443,code:"Gi"},{id:"p36",lat:41.8864,lng:12.5454,code:"Mc"},
+{id:"p37",lat:41.8877,lng:12.5418,code:"Lo"},{id:"p38",lat:41.8869,lng:12.5428,code:"Ar"},
+{id:"p39",lat:41.8863,lng:12.5467,code:"Sd"},{id:"p40",lat:41.8884,lng:12.5436,code:"Ai"},
+].map(t=>({...t,ts:"2025-03-01T09:00:00Z",prov:true,photo:null}));
 
-// ══════════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════════
+// ── STATE ────────────────────────────────────
 let map, addMode=false, pendingLL=null, editingId=null, selCode=null, pendingPhoto=null;
 let mrkrs={}, active=new Set(SPECIES.map(s=>s.code));
-const showProv=true;
 
-// ══════════════════════════════════════════════
-// SIDEBAR MOBILE
-// ══════════════════════════════════════════════
-function openSb(){document.getElementById('sb').classList.add('open');document.getElementById('sb-overlay').classList.add('on');}
-function closeSb(){document.getElementById('sb').classList.remove('open');document.getElementById('sb-overlay').classList.remove('on');}
+// ── UTILS ────────────────────────────────────
+const $=id=>document.getElementById(id);
+const setSync=(cls,label)=>{$("sync-dot").className=cls;$("sync-label").textContent=label;}
+const hideLoader=()=>{const l=$("loading");l.classList.add("hide");setTimeout(()=>l.style.display="none",500);}
 
-// ══════════════════════════════════════════════
-// SYNC STATUS
-// ══════════════════════════════════════════════
-function setSyncStatus(status, label){
-  const dot=document.getElementById('sync-dot');
-  dot.className='';
-  dot.classList.add(status);
-  document.getElementById('sync-label').textContent=label;
-}
-
-// ══════════════════════════════════════════════
-// ICONS
-// ══════════════════════════════════════════════
+// ── ICONS ────────────────────────────────────
 function icoHTML(s){
-  if(s.sym==='triangle') return`<div class="sp-ico"><div style="width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:14px solid ${s.color};"></div></div>`;
-  if(s.sym==='star') return`<div class="sp-ico" style="color:${s.color};font-size:15px;line-height:1;">★</div>`;
-  const r=s.sym==='square'?'3px':'50%';
+  if(s.sym==="triangle") return`<div class="sp-ico"><div style="width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:14px solid ${s.color};"></div></div>`;
+  if(s.sym==="star")     return`<div class="sp-ico" style="color:${s.color};font-size:15px;line-height:1;">★</div>`;
+  const r=s.sym==="square"?"3px":"50%";
   return`<div class="sp-ico" style="background:${s.color};border-radius:${r};border:1.5px solid rgba(255,255,255,.2);font-size:7px;color:white;font-weight:700;">${s.code.substring(0,2)}</div>`;
 }
-
 function mkIcon(code,prov){
-  const s=SPECIES.find(x=>x.code===code);
-  if(!s) return L.divIcon({html:'?',className:''});
-  const c=s.color,cd=s.code.substring(0,2),da=prov?'stroke-dasharray="4 2"':'';
+  const s=SPECIES.find(x=>x.code===code)||{color:"#888",sym:"circle",code:"?"};
+  const c=s.color,cd=s.code.substring(0,2),da=prov?"stroke-dasharray=\"4 2\"":"";
   let svg;
-  if(s.sym==='triangle'){
-    svg=`<svg width="26" height="26" viewBox="0 0 26 26"><polygon points="13,2 24,23 2,23" fill="${c}" stroke="white" stroke-width="1.5"/>${prov?`<polygon points="13,2 24,23 2,23" fill="none" stroke="#e67e22" stroke-width="1.5" ${da}/>`:''}
-    <text x="13" y="19" text-anchor="middle" font-size="7" fill="white" font-family="monospace" font-weight="bold">${cd}</text></svg>`;
-  }else if(s.sym==='star'){
-    svg=`<svg width="26" height="26" viewBox="0 0 26 26"><polygon points="13,2 16,10 24,10 18,15 20,23 13,18 6,23 8,15 2,10 10,10" fill="${c}" stroke="white" stroke-width="1"/>${prov?`<polygon points="13,2 16,10 24,10 18,15 20,23 13,18 6,23 8,15 2,10 10,10" fill="none" stroke="#e67e22" stroke-width="1.5" ${da}/>`:''}
-    <text x="13" y="17" text-anchor="middle" font-size="6" fill="white" font-family="monospace">${cd}</text></svg>`;
-  }else if(s.sym==='square'){
-    svg=`<svg width="24" height="24" viewBox="0 0 24 24"><rect x="1" y="1" width="22" height="22" rx="3" fill="${c}" stroke="white" stroke-width="1.5"/>${prov?`<rect x="1" y="1" width="22" height="22" rx="3" fill="none" stroke="#e67e22" stroke-width="1.5" ${da}/>`:''}
-    <text x="12" y="15" text-anchor="middle" font-size="7" fill="white" font-family="monospace" font-weight="bold">${cd}</text></svg>`;
-  }else{
-    svg=`<svg width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="13" r="12" fill="${c}" stroke="white" stroke-width="1.5"/>${prov?`<circle cx="13" cy="13" r="12" fill="none" stroke="#e67e22" stroke-width="1.5" ${da}/>`:''}
-    <text x="13" y="16.5" text-anchor="middle" font-size="7.5" fill="white" font-family="monospace" font-weight="bold">${cd}</text></svg>`;
-  }
-  return L.divIcon({html:svg,className:'',iconSize:[26,26],iconAnchor:[13,13]});
+  if(s.sym==="triangle"){svg=`<svg width="26" height="26" viewBox="0 0 26 26"><polygon points="13,2 24,23 2,23" fill="${c}" stroke="white" stroke-width="1.5"/>${prov?`<polygon points="13,2 24,23 2,23" fill="none" stroke="#e67e22" stroke-width="1.5" ${da}/>`:""}
+  <text x="13" y="19" text-anchor="middle" font-size="7" fill="white" font-family="monospace" font-weight="bold">${cd}</text></svg>`;}
+  else if(s.sym==="star"){svg=`<svg width="26" height="26" viewBox="0 0 26 26"><polygon points="13,2 16,10 24,10 18,15 20,23 13,18 6,23 8,15 2,10 10,10" fill="${c}" stroke="white" stroke-width="1"/>${prov?`<polygon points="13,2 16,10 24,10 18,15 20,23 13,18 6,23 8,15 2,10 10,10" fill="none" stroke="#e67e22" stroke-width="1.5" ${da}/>`:""}
+  <text x="13" y="17" text-anchor="middle" font-size="6" fill="white" font-family="monospace">${cd}</text></svg>`;}
+  else if(s.sym==="square"){svg=`<svg width="24" height="24" viewBox="0 0 24 24"><rect x="1" y="1" width="22" height="22" rx="3" fill="${c}" stroke="white" stroke-width="1.5"/>${prov?`<rect x="1" y="1" width="22" height="22" rx="3" fill="none" stroke="#e67e22" stroke-width="1.5" ${da}/>`:""}
+  <text x="12" y="15" text-anchor="middle" font-size="7" fill="white" font-family="monospace" font-weight="bold">${cd}</text></svg>`;}
+  else{svg=`<svg width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="13" r="12" fill="${c}" stroke="white" stroke-width="1.5"/>${prov?`<circle cx="13" cy="13" r="12" fill="none" stroke="#e67e22" stroke-width="1.5" ${da}/>`:""}
+  <text x="13" y="16.5" text-anchor="middle" font-size="7.5" fill="white" font-family="monospace" font-weight="bold">${cd}</text></svg>`;}
+  return L.divIcon({html:svg,className:"",iconSize:[26,26],iconAnchor:[13,13]});
 }
 
-// ══════════════════════════════════════════════
-// SIDEBAR
-// ══════════════════════════════════════════════
-function renderSidebar(q=''){
-  const treesArr=Object.values(mrkrs).map(x=>x.data);
-  const el=document.getElementById('sp-list');
-  el.innerHTML=SPECIES.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())||s.code.toLowerCase().includes(q.toLowerCase())).map(s=>{
-    const cnt=treesArr.filter(t=>t.code===s.code).length;
-    return`<div class="sp-row ${active.has(s.code)?'':'off'}" onclick="toggleSp('${s.code}')">${icoHTML(s)}<span class="sp-cd">${s.code}</span><span class="sp-nm">${s.name}</span><span class="sp-ct">${cnt||''}</span></div>`;
-  }).join('');
-  document.getElementById('sp-vis').textContent=active.size;
-  document.getElementById('tot').textContent=treesArr.length;
+// ── SIDEBAR ──────────────────────────────────
+function renderSidebar(q=""){
+  const all=Object.values(mrkrs).map(x=>x.data);
+  $("sp-list").innerHTML=SPECIES.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())||s.code.toLowerCase().includes(q.toLowerCase())).map(s=>{
+    const cnt=all.filter(t=>t.code===s.code).length;
+    return`<div class="sp-row ${active.has(s.code)?"":"off"}" onclick="W.toggleSp('${s.code}')">${icoHTML(s)}<span class="sp-cd">${s.code}</span><span class="sp-nm">${s.name}</span><span class="sp-ct">${cnt||""}</span></div>`;
+  }).join("");
+  $("sp-vis").textContent=active.size;
+  $("tot").textContent=Object.keys(mrkrs).length;
 }
-function toggleSp(code){
-  if(active.has(code)) active.delete(code); else active.add(code);
-  renderSidebar(document.getElementById('si').value);
-  refreshVis();
-}
-document.getElementById('si').addEventListener('input',e=>renderSidebar(e.target.value));
+function toggleSp(code){active.has(code)?active.delete(code):active.add(code);renderSidebar($("si").value);refreshVis();}
+function filterSp(q){renderSidebar(q);}
+function refreshVis(){Object.entries(mrkrs).forEach(([,{m,data}])=>{active.has(data.code)?(!map.hasLayer(m)&&m.addTo(map)):(map.hasLayer(m)&&map.removeLayer(m));});}
 
-// ══════════════════════════════════════════════
-// ADD MODE
-// ══════════════════════════════════════════════
+// ── MOBILE SIDEBAR ───────────────────────────
+function openSb(){$("sb").classList.add("open");$("sb-overlay").classList.add("on");}
+function closeSb(){$("sb").classList.remove("open");$("sb-overlay").classList.remove("on");}
+
+// ── ADD MODE ─────────────────────────────────
 function toggleAdd(){
   addMode=!addMode;
-  const btn=document.getElementById('add-btn');
-  btn.classList.toggle('on',addMode);
-  btn.textContent=addMode?'✕ Esci':'＋ Aggiungi';
-  document.getElementById('tb-lbl').textContent=addMode?'tocca la mappa':'seleziona modalita';
-  map.getContainer().style.cursor=addMode?'crosshair':'';
+  $("add-btn").classList.toggle("on",addMode);
+  $("add-btn").textContent=addMode?"✕ Esci":"＋ Aggiungi";
+  map.getContainer().style.cursor=addMode?"crosshair":"";
 }
 
-// ══════════════════════════════════════════════
-// GPS NATIVO
-// ══════════════════════════════════════════════
-function useCurrentGPS(){
-  if(!navigator.geolocation){alert('GPS non disponibile.');return;}
-  document.getElementById('tb-lbl').textContent='📡 Rilevamento GPS...';
+// ── GPS ──────────────────────────────────────
+function useGPS(){
+  if(!navigator.geolocation){alert("GPS non disponibile.");return;}
+  $("load-msg")&&($("load-msg").textContent="Rilevamento GPS...");
   navigator.geolocation.getCurrentPosition(
     pos=>{
       const lat=pos.coords.latitude,lng=pos.coords.longitude;
       map.setView([lat,lng],20);
-      document.getElementById('tb-lbl').textContent=`📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-      openSpModal('📍 Aggiungi albero (GPS)',`Posizione attuale: ${lat.toFixed(5)}, ${lng.toFixed(5)}`,'Aggiungi ✓',{lat,lng},null);
+      openSpModal("📍 Aggiungi albero (GPS)",`${lat.toFixed(5)}, ${lng.toFixed(5)}`,"Aggiungi ✓",{lat,lng},null);
     },
-    ()=>{
-      document.getElementById('tb-lbl').textContent='GPS non disponibile';
-      alert('Permesso GPS negato. Consenti la posizione nelle impostazioni del browser.');
-    },
+    ()=>alert("Permesso GPS negato. Consentilo nelle impostazioni del browser."),
     {enableHighAccuracy:true,timeout:10000,maximumAge:0}
   );
 }
 
-// ══════════════════════════════════════════════
-// FOTO + EXIF + COMPRESSIONE 500KB
-// ══════════════════════════════════════════════
+// ── PHOTO COMPRESSION ────────────────────────
 async function compressPhoto(file){
   return new Promise(resolve=>{
     const url=URL.createObjectURL(file);
     const img=new Image();
     img.onload=()=>{
       URL.revokeObjectURL(url);
-      const maxDim=1600;
-      const ratio=Math.min(maxDim/img.width,maxDim/img.height,1);
-      const canvas=document.createElement('canvas');
-      canvas.width=Math.round(img.width*ratio);
-      canvas.height=Math.round(img.height*ratio);
-      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
-      // Target: 500KB binary → ~667K chars in base64
+      const maxDim=1600,ratio=Math.min(maxDim/img.width,maxDim/img.height,1);
+      const canvas=document.createElement("canvas");
+      canvas.width=Math.round(img.width*ratio);canvas.height=Math.round(img.height*ratio);
+      canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);
       const target=500*1024*4/3;
       let lo=0.1,hi=0.95,best=null;
-      for(let i=0;i<12;i++){
-        const q=(lo+hi)/2;
-        const d=canvas.toDataURL('image/jpeg',q);
-        if(d.length<=target){lo=q;best=d;}else{hi=q;}
-      }
-      resolve(best||canvas.toDataURL('image/jpeg',0.1));
+      for(let i=0;i<12;i++){const q=(lo+hi)/2,d=canvas.toDataURL("image/jpeg",q);d.length<=target?(lo=q,best=d):(hi=q);}
+      resolve(best||canvas.toDataURL("image/jpeg",0.1));
     };
-    img.onerror=()=>{URL.revokeObjectURL(url);resolve(null);};
     img.src=url;
   });
 }
 
-function addFromPhoto(ev){
-  const file=ev.target.files[0];if(!file)return;ev.target.value='';
-  document.getElementById('tb-lbl').textContent='⏳ Elaborazione foto...';
-  compressPhoto(file).then(photo=>{
-    pendingPhoto=photo;
-    if(typeof EXIF==='undefined'){
-      openSpModal('📷 Albero da foto','GPS non disponibile — usa il pulsante 📍','Aggiungi ✓',null,null);
-      return;
-    }
-    EXIF.getData(file,function(){
-      const la=EXIF.getTag(this,'GPSLatitude'),lr=EXIF.getTag(this,'GPSLatitudeRef');
-      const lo=EXIF.getTag(this,'GPSLongitude'),lor=EXIF.getTag(this,'GPSLongitudeRef');
-      if(!la||!lo){
-        document.getElementById('tb-lbl').textContent='Nessun GPS in foto';
-        if(confirm('Nessun GPS nella foto (tipico su iPhone).\nVuoi usare la posizione GPS attuale?')){
-          useCurrentGPS();
-        }
-        return;
-      }
-      function n(v){return typeof v==='object'&&v!==null?v.numerator/v.denominator:v;}
-      function d(a){return n(a[0])+n(a[1])/60+n(a[2])/3600;}
-      let lat=d(la),lng=d(lo);
-      if(lr==='S')lat=-lat;if(lor==='W')lng=-lng;
-      map.setView([lat,lng],20);
-      document.getElementById('tb-lbl').textContent=`📷 ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-      openSpModal('📷 Albero da foto',`GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)}`,'Aggiungi ✓',{lat,lng},null);
-    });
+async function addFromPhoto(ev){
+  const file=ev.target.files[0];if(!file)return;ev.target.value="";
+  const photo=await compressPhoto(file);
+  pendingPhoto=photo;
+  if(typeof EXIF==="undefined"){openSpModal("📷 Albero da foto","Usa il pulsante 📍 per il GPS","Aggiungi ✓",null,null);return;}
+  EXIF.getData(file,function(){
+    const la=EXIF.getTag(this,"GPSLatitude"),lr=EXIF.getTag(this,"GPSLatitudeRef");
+    const lo=EXIF.getTag(this,"GPSLongitude"),lor=EXIF.getTag(this,"GPSLongitudeRef");
+    if(!la||!lo){if(confirm("Nessun GPS nella foto.
+Vuoi usare la posizione GPS attuale?"))useGPS();return;}
+    const n=v=>typeof v==="object"&&v!==null?v.numerator/v.denominator:v;
+    const d=a=>n(a[0])+n(a[1])/60+n(a[2])/3600;
+    let lat=d(la),lng=d(lo);
+    if(lr==="S")lat=-lat;if(lor==="W")lng=-lng;
+    map.setView([lat,lng],20);
+    openSpModal("📷 Albero da foto",`GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)}`,"Aggiungi ✓",{lat,lng},null);
   });
 }
 
-// ══════════════════════════════════════════════
-// SPECIES MODAL
-// ══════════════════════════════════════════════
+// ── SPECIES MODAL ────────────────────────────
 function openSpModal(title,sub,okLabel,ll,tid){
   selCode=null;pendingLL=ll||null;editingId=tid||null;
-  document.getElementById('sp-modal-title').textContent=title;
-  document.getElementById('sp-modal-sub').textContent=sub;
-  document.getElementById('sp-modal-ok').textContent=okLabel;
-  const cur=tid?mrkrs[tid]?.data?.code:null;
-  if(cur)selCode=cur;
-  document.getElementById('sp-grid').innerHTML=SPECIES.map(s=>`<div class="sp-opt ${s.code===cur?'sel':''}" id="opt-${s.code}" onclick="pickSp('${s.code}')">${icoHTML(s)}<span><span style="color:var(--muted);font-size:9px;">${s.code} · </span>${s.name}</span></div>`).join('');
-  if(cur)setTimeout(()=>document.getElementById('opt-'+cur)?.scrollIntoView({block:'center'}),60);
-  document.getElementById('sp-modal').classList.add('on');
+  $("sp-modal-title").textContent=title;$("sp-modal-sub").textContent=sub;$("sp-modal-ok").textContent=okLabel;
+  const cur=tid?mrkrs[tid]?.data?.code:null;if(cur)selCode=cur;
+  $("sp-grid").innerHTML=SPECIES.map(s=>`<div class="sp-opt ${s.code===cur?"sel":""}" id="opt-${s.code}" onclick="W.pickSp(\'${s.code}\')">${icoHTML(s)}<span><span style="color:var(--muted);font-size:9px;">${s.code} · </span>${s.name}</span></div>`).join("");
+  if(cur)setTimeout(()=>$("opt-"+cur)?.scrollIntoView({block:"center"}),60);
+  $("sp-modal").classList.add("on");
 }
-function pickSp(code){selCode=code;document.querySelectorAll('.sp-opt').forEach(e=>e.classList.remove('sel'));document.getElementById('opt-'+code)?.classList.add('sel');}
-function closeSpModal(){document.getElementById('sp-modal').classList.remove('on');pendingLL=null;editingId=null;selCode=null;}
+function pickSp(code){selCode=code;document.querySelectorAll(".sp-opt").forEach(e=>e.classList.remove("sel"));$("opt-"+code)?.classList.add("sel");}
+function closeSpModal(){$("sp-modal").classList.remove("on");pendingLL=null;editingId=null;selCode=null;}
 
 async function confirmSp(){
   if(!selCode)return;
-  if(editingId){
-    // Edit existing tree species
-    try{
-      await db.collection('trees').doc(editingId).update({code:selCode,prov:false});
-      setSyncStatus('ok','Salvato');
-    }catch(e){setSyncStatus('err','Errore salvataggio');}
-    closeSpModal();
-  }else if(pendingLL){
-    // Add new tree
-    const t={lat:pendingLL.lat,lng:pendingLL.lng,code:selCode,ts:new Date().toISOString(),prov:false,photo:pendingPhoto||null};
-    pendingPhoto=null;
-    try{
-      await db.collection('trees').add(t);
-      setSyncStatus('ok','Salvato');
-    }catch(e){setSyncStatus('err','Errore salvataggio');console.error(e);}
-    closeSpModal();
-  }
+  try{
+    if(editingId){
+      await updateDoc(DOC(editingId),{code:selCode,prov:false});
+      setSync("ok","Salvato");
+    }else if(pendingLL){
+      const t={lat:pendingLL.lat,lng:pendingLL.lng,code:selCode,ts:new Date().toISOString(),prov:false,photo:pendingPhoto||null};
+      pendingPhoto=null;
+      await addDoc(COL(),t);
+      setSync("ok","Salvato");
+    }
+  }catch(e){setSync("err","Errore: "+e.message);console.error(e);}
+  closeSpModal();
 }
 
-// ══════════════════════════════════════════════
-// FIRESTORE REALTIME LISTENER
-// ══════════════════════════════════════════════
-function popContent(t,id){
+// ── POPUP CONTENT ────────────────────────────
+function popContent(id,t){
   const s=SPECIES.find(x=>x.code===t.code);
-  const dt=new Date(t.ts).toLocaleDateString('it-IT');
+  const dt=new Date(t.ts).toLocaleDateString("it-IT");
   return`<div class="pop">
     <div class="pop-name">${s?s.name:t.code}</div>
-    ${s&&s.fam?`<div class="pop-fam">${s.fam}</div>`:''}
-    ${s&&s.sci?`<div class="pop-sci">${s.sci}</div>`:''}
-    ${s&&s.note?`<div class="pop-note">${s.note}</div>`:''}
-    ${t.photo?`<img src="${t.photo}" style="width:100%;border-radius:6px;margin:8px 0;border:1px solid var(--b1);display:block;"/>`:``}
-    ${t.prov?`<div class="pop-prov">⚠ Posizione approssimativa — trascina per correggere</div>`:''}
+    ${s?.fam?`<div class="pop-fam">${s.fam}</div>`:""}
+    ${s?.sci?`<div class="pop-sci">${s.sci}</div>`:""}
+    ${s?.note?`<div class="pop-note">${s.note}</div>`:""}
+    ${t.photo?`<img src="${t.photo}" style="width:100%;border-radius:6px;margin:8px 0;border:1px solid var(--b1);display:block;"/>` :""}
+    ${t.prov?`<div class="pop-prov">⚠ Posizione approssimativa — trascina per correggere</div>`:""}
     <div class="pop-meta">cod: ${t.code} · ${dt}<br>📍 ${t.lat.toFixed(5)}, ${t.lng.toFixed(5)}</div>
     <div class="pop-btns">
-      <button class="pb pb-mod" onclick="startEdit('${id}')">✏ Modifica specie</button>
-      <button class="pb pb-del" onclick="delTree('${id}')">✕ Elimina</button>
+      <button class="pb pb-mod" onclick="W.startEdit(\'${id}\')">✏ Modifica specie</button>
+      <button class="pb pb-del" onclick="W.delTree(\'${id}\')">✕ Elimina</button>
     </div></div>`;
 }
 
+// ── MARKERS ──────────────────────────────────
 function putMarker(id,t){
   if(mrkrs[id]){
-    // Update existing marker
-    const{m}=mrkrs[id];
-    m.setLatLng([t.lat,t.lng]);
-    m.setIcon(mkIcon(t.code,t.prov));
-    m.setPopupContent(popContent(t,id));
-    mrkrs[id].data=t;
-    return;
+    const{m}=mrkrs[id];m.setLatLng([t.lat,t.lng]);m.setIcon(mkIcon(t.code,t.prov));m.setPopupContent(popContent(id,t));mrkrs[id].data=t;return;
   }
   const m=L.marker([t.lat,t.lng],{icon:mkIcon(t.code,t.prov),draggable:true});
-  m.on('dragend',async e=>{
+  m.on("dragend",async e=>{
     const p=e.target.getLatLng();
-    try{
-      await db.collection('trees').doc(id).update({lat:p.lat,lng:p.lng,prov:false});
-      setSyncStatus('ok','Posizione salvata');
-    }catch(err){setSyncStatus('err','Errore salvataggio');}
+    try{await updateDoc(DOC(id),{lat:p.lat,lng:p.lng,prov:false});setSync("ok","Posizione salvata");}
+    catch(err){setSync("err","Errore salvataggio");}
   });
-  m.bindPopup(popContent(t,id),{maxWidth:280});
-  const show=active.has(t.code);
-  if(show)m.addTo(map);
+  m.bindPopup(popContent(id,t),{maxWidth:280});
+  if(active.has(t.code))m.addTo(map);
   mrkrs[id]={m,data:t};
 }
 
-function removeMarker(id){
-  if(!mrkrs[id])return;
-  map.removeLayer(mrkrs[id].m);
-  delete mrkrs[id];
-}
+function removeMarker(id){if(!mrkrs[id])return;map.removeLayer(mrkrs[id].m);delete mrkrs[id];}
 
-function refreshVis(){
-  Object.entries(mrkrs).forEach(([id,{m,data}])=>{
-    if(active.has(data.code)){if(!map.hasLayer(m))m.addTo(map);}
-    else{if(map.hasLayer(m))map.removeLayer(m);}
-  });
-}
-
-async function startEdit(id){
-  map.closePopup();
-  const t=mrkrs[id]?.data;if(!t)return;
-  openSpModal('Modifica specie',`${t.lat.toFixed(5)}, ${t.lng.toFixed(5)}`,'Salva ✓',null,id);
-}
+function startEdit(id){map.closePopup();const t=mrkrs[id]?.data;if(!t)return;openSpModal("Modifica specie",`${t.lat.toFixed(5)}, ${t.lng.toFixed(5)}`,"Salva ✓",null,id);}
 
 async function delTree(id){
-  try{
-    await db.collection('trees').doc(id).delete();
-    setSyncStatus('ok','Eliminato');
-  }catch(e){setSyncStatus('err','Errore eliminazione');}
+  try{await deleteDoc(DOC(id));setSync("ok","Eliminato");}
+  catch(e){setSync("err","Errore eliminazione");}
   map.closePopup();
 }
 
-// ══════════════════════════════════════════════
-// CLEAR ALL
-// ══════════════════════════════════════════════
-function openClearModal(){
-  document.getElementById('clear-count').textContent=Object.keys(mrkrs).length;
-  document.getElementById('clear-input').value='';
-  document.getElementById('clear-ok').disabled=true;
-  document.getElementById('clear-ok').style.opacity='.4';
-  document.getElementById('clear-modal').classList.add('on');
-  setTimeout(()=>document.getElementById('clear-input').focus(),100);
-}
-function closeClearModal(){document.getElementById('clear-modal').classList.remove('on');}
-function checkClearInput(){
-  const ok=document.getElementById('clear-input').value.trim().toUpperCase()==='CANCELLA';
-  const btn=document.getElementById('clear-ok');
-  btn.disabled=!ok;btn.style.opacity=ok?'1':'.4';btn.style.cursor=ok?'pointer':'not-allowed';
-}
+// ── CLEAR ALL ────────────────────────────────
+function openClearModal(){$("clear-count").textContent=Object.keys(mrkrs).length;$("clear-input").value="";const b=$("clear-ok");b.disabled=true;b.style.opacity=".4";$("clear-modal").classList.add("on");setTimeout(()=>$("clear-input").focus(),100);}
+function closeClearModal(){$("clear-modal").classList.remove("on");}
+function checkClear(){const ok=$("clear-input").value.trim().toUpperCase()==="CANCELLA";const b=$("clear-ok");b.disabled=!ok;b.style.opacity=ok?"1":".4";b.style.cursor=ok?"pointer":"not-allowed";}
 async function executeClear(){
-  if(document.getElementById('clear-input').value.trim().toUpperCase()!=='CANCELLA')return;
-  closeClearModal();
-  setSyncStatus('','Cancellazione in corso...');
-  const snap=await db.collection('trees').get();
-  const batch=db.batch();
-  snap.forEach(doc=>batch.delete(doc.ref));
-  await batch.commit();
-  setSyncStatus('ok','Tutti gli alberi eliminati');
+  if($("clear-input").value.trim().toUpperCase()!=="CANCELLA")return;
+  closeClearModal();setSync("","Cancellazione...");
+  const snap=await getDocs(COL());
+  const batch=writeBatch(db);snap.forEach(d=>batch.delete(d.ref));
+  await batch.commit();setSync("ok","Tutti gli alberi eliminati");
 }
 
-// ══════════════════════════════════════════════
-// EXPORT / IMPORT
-// ══════════════════════════════════════════════
+// ── EXPORT / IMPORT ──────────────────────────
 function exportJSON(){
   const trees=Object.entries(mrkrs).map(([id,{data}])=>({id,...data}));
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([JSON.stringify({project:'Largo Preneste',date:new Date().toISOString(),trees},null,2)],{type:'application/json'}));
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify({project:"Largo Preneste",date:new Date().toISOString(),trees},null,2)],{type:"application/json"}));
   a.download=`largo-preneste-${Date.now()}.json`;a.click();
 }
-function importJSON(ev){
+async function importJSON(ev){
   const f=ev.target.files[0];if(!f)return;
   const r=new FileReader();
   r.onload=async e=>{
     try{
-      const d=JSON.parse(e.target.result);
-      const trees=d.trees||d;
-      const batch=db.batch();
-      trees.forEach(t=>{
-        const{id,...data}=t;
-        const ref=id?db.collection('trees').doc(id):db.collection('trees').doc();
-        batch.set(ref,data);
-      });
-      await batch.commit();
-      setSyncStatus('ok','Importazione completata');
-    }catch(err){alert('File JSON non valido');}
+      const d=JSON.parse(e.target.result);const trees=d.trees||d;
+      const batch=writeBatch(db);
+      trees.forEach(t=>{const{id,...data}=t;batch.set(id?DOC(id):doc(COL()),data);});
+      await batch.commit();setSync("ok","Importazione completata");
+    }catch(err){alert("File JSON non valido");}
   };
-  r.readAsText(f);ev.target.value='';
+  r.readAsText(f);ev.target.value="";
 }
 
-// ══════════════════════════════════════════════
-// NEW SPECIES
-// ══════════════════════════════════════════════
-function openNewSp(){
-  ['nsp-code','nsp-name','nsp-sci','nsp-fam','nsp-note'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('nsp-color').value='#3d8b5a';
-  document.getElementById('nsp-sym').value='circle';
-  updateNspPrev();
-  document.getElementById('nsp-modal').classList.add('on');
-}
+// ── NEW SPECIES ───────────────────────────────
+function openNewSp(){["nsp-code","nsp-name","nsp-sci","nsp-fam","nsp-note"].forEach(id=>$(id).value="");$("nsp-color").value="#3d8b5a";$("nsp-sym").value="circle";updateNspPrev();$("nsp-modal").classList.add("on");}
 function updateNspPrev(){
-  const c=document.getElementById('nsp-color').value,sym=document.getElementById('nsp-sym').value;
-  const nm=document.getElementById('nsp-name').value||'—';
-  const ico=document.getElementById('nsp-ico-prev');
-  const r=sym==='square'?'3px':'50%';
-  if(sym==='triangle')ico.innerHTML=`<div style="width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-bottom:15px solid ${c};"></div>`;
-  else if(sym==='star')ico.innerHTML=`<span style="color:${c};font-size:16px;">★</span>`;
+  const c=$("nsp-color").value,sym=$("nsp-sym").value,nm=$("nsp-name").value||"—";
+  const ico=$("nsp-ico-prev"),r=sym==="square"?"3px":"50%";
+  if(sym==="triangle")ico.innerHTML=`<div style="width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-bottom:15px solid ${c};"></div>`;
+  else if(sym==="star")ico.innerHTML=`<span style="color:${c};font-size:16px;">★</span>`;
   else ico.innerHTML=`<div style="width:18px;height:18px;background:${c};border-radius:${r};"></div>`;
-  document.getElementById('nsp-nm-prev').textContent=nm;
+  $("nsp-nm-prev").textContent=nm;
 }
-['nsp-color','nsp-sym','nsp-name'].forEach(id=>document.getElementById(id).addEventListener('input',updateNspPrev));
 function saveNewSp(){
-  const code=document.getElementById('nsp-code').value.trim().toUpperCase();
-  const name=document.getElementById('nsp-name').value.trim();
-  if(!code||!name){alert('Codice e nome obbligatori.');return;}
+  const code=$("nsp-code").value.trim().toUpperCase(),name=$("nsp-name").value.trim();
+  if(!code||!name){alert("Codice e nome obbligatori.");return;}
   if(SPECIES.find(s=>s.code===code)){alert(`Codice "${code}" gia esistente.`);return;}
-  SPECIES.push({code,name,color:document.getElementById('nsp-color').value,sym:document.getElementById('nsp-sym').value,
-    sci:document.getElementById('nsp-sci').value.trim(),fam:document.getElementById('nsp-fam').value.trim(),
-    note:document.getElementById('nsp-note').value.trim()});
-  active.add(code);
-  document.getElementById('nsp-modal').classList.remove('on');
-  renderSidebar(document.getElementById('si').value);
+  SPECIES.push({code,name,color:$("nsp-color").value,sym:$("nsp-sym").value,sci:$("nsp-sci").value.trim(),fam:$("nsp-fam").value.trim(),note:$("nsp-note").value.trim()});
+  active.add(code);$("nsp-modal").classList.remove("on");renderSidebar();
 }
 
-// ══════════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════════
-map=L.map('map').setView([41.8879,12.5444],18);
-const osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:22,maxNativeZoom:19}).addTo(map);
-const sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:22,maxNativeZoom:19});
-L.control.layers({'🗺 Mappa':osm,'🛰 Satellite':sat},{},{position:'topright'}).addTo(map);
-map.on('click',e=>{if(!addMode)return;pendingPhoto=null;openSpModal('+ Aggiungi albero',`${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`,'Aggiungi',e.latlng,null);});
+// ── EXPOSE TO GLOBAL (needed for onclick in HTML) ──
+const W={openSb,closeSb,toggleAdd,useGPS,addFromPhoto,toggleSp,filterSp,openSpModal,closeSpModal,pickSp,confirmSp,startEdit,delTree,openClearModal,closeClearModal,checkClear,executeClear,exportJSON,importJSON,openNewSp,updateNspPrev,saveNewSp};
+window.W=W;
 
-// Firestore realtime listener
-db.collection('trees').onSnapshot(async snapshot=>{
-  // First load: if empty, write initial trees
-  if(snapshot.empty && Object.keys(mrkrs).length===0){
-    setSyncStatus('','Prima configurazione...');
-    const batch=db.batch();
-    INIT.forEach(t=>{
-      const{id,...data}=t;
-      batch.set(db.collection('trees').doc(id),data);
-    });
+// ── MAP INIT ─────────────────────────────────
+map=L.map("map").setView([41.8879,12.5444],18);
+const osm=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap",maxZoom:22,maxNativeZoom:19}).addTo(map);
+const sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{attribution:"© Esri",maxZoom:22,maxNativeZoom:19});
+L.control.layers({"🗺 Mappa":osm,"🛰 Satellite":sat},{},{position:"topright"}).addTo(map);
+map.on("click",e=>{if(!addMode)return;pendingPhoto=null;openSpModal("+ Aggiungi albero",`${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`,"Aggiungi",e.latlng,null);});
+
+// ── FIRESTORE LISTENER ───────────────────────
+let firstLoad=true;
+onSnapshot(COL(), async snapshot=>{
+  if(snapshot.empty && firstLoad){
+    firstLoad=false;
+    setSync("","Prima configurazione...");
+    $("load-msg").textContent="Caricamento dati iniziali...";
+    const batch=writeBatch(db);
+    INIT.forEach(({id,...data})=>batch.set(DOC(id),data));
     await batch.commit();
     return;
   }
-
+  firstLoad=false;
   snapshot.docChanges().forEach(change=>{
-    const id=change.doc.id;
-    const t=change.doc.data();
-    if(change.type==='added'||change.type==='modified'){
-      putMarker(id,t);
-    }
-    if(change.type==='removed'){
-      removeMarker(id);
-    }
+    const id=change.doc.id,t=change.doc.data();
+    if(change.type==="added"||change.type==="modified") putMarker(id,t);
+    if(change.type==="removed") removeMarker(id);
   });
-
-  renderSidebar(document.getElementById('si').value);
-  setSyncStatus('ok','Sincronizzato');
-
-  // Hide loading screen after first data
-  const loader=document.getElementById('loading');
-  if(!loader.classList.contains('hide')){
-    loader.classList.add('hide');
-    setTimeout(()=>loader.style.display='none',500);
-  }
+  renderSidebar($("si").value);
+  setSync("ok","Sincronizzato");
+  hideLoader();
 },err=>{
-  setSyncStatus('err','Errore connessione');
-  console.error(err);
-  document.getElementById('loading').classList.add('hide');
+  console.error("Firestore error:",err);
+  setSync("err","Errore: "+err.code);
+  $("load-msg").textContent="Errore connessione: "+err.code;
+  hideLoader();
 });
 </script>
 </body>
