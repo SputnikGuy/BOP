@@ -262,28 +262,6 @@ let SPECIES=[
 {code:"Sd",name:"Sedice/Verbasco",color:"#d4e09b",sym:"circle",sci:"Verbascum thapsus",fam:"Scrophulariaceae",note:"Biennale pioniera fino a 2m. Foglie fitoterapiche. Fiori gialli."},
 ];
 
-const INIT=[
-{id:"p01",lat:41.8898,lng:12.5432,code:"Le"},{id:"p02",lat:41.8900,lng:12.5444,code:"Q"},
-{id:"p03",lat:41.8896,lng:12.5426,code:"Cn"},{id:"p04",lat:41.8897,lng:12.5458,code:"Ro"},
-{id:"p05",lat:41.8899,lng:12.5420,code:"PN"},{id:"p06",lat:41.8894,lng:12.5450,code:"Ab"},
-{id:"p07",lat:41.8893,lng:12.5463,code:"N"}, {id:"p08",lat:41.8888,lng:12.5438,code:"U"},
-{id:"p09",lat:41.8886,lng:12.5450,code:"Al"},{id:"p10",lat:41.8883,lng:12.5430,code:"Ac"},
-{id:"p11",lat:41.8889,lng:12.5462,code:"Bag"},{id:"p12",lat:41.8885,lng:12.5420,code:"Pr"},
-{id:"p13",lat:41.8882,lng:12.5465,code:"Bp"},{id:"p14",lat:41.8879,lng:12.5444,code:"A"},
-{id:"p15",lat:41.8878,lng:12.5434,code:"B"}, {id:"p16",lat:41.8877,lng:12.5454,code:"Lig"},
-{id:"p17",lat:41.8881,lng:12.5418,code:"Ci"},{id:"p18",lat:41.8878,lng:12.5463,code:"Or"},
-{id:"p19",lat:41.8875,lng:12.5440,code:"Ol"},{id:"p20",lat:41.8872,lng:12.5450,code:"G"},
-{id:"p21",lat:41.8876,lng:12.5430,code:"Ne"},{id:"p22",lat:41.8873,lng:12.5460,code:"Ti"},
-{id:"p23",lat:41.8869,lng:12.5447,code:"F"}, {id:"p24",lat:41.8868,lng:12.5435,code:"Mi"},
-{id:"p25",lat:41.8871,lng:12.5457,code:"Pe"},{id:"p26",lat:41.8866,lng:12.5444,code:"Rc"},
-{id:"p27",lat:41.8872,lng:12.5424,code:"Vib"},{id:"p28",lat:41.8868,lng:12.5460,code:"Sa"},
-{id:"p29",lat:41.8874,lng:12.5467,code:"Ros"},{id:"p30",lat:41.8862,lng:12.5440,code:"Ov"},
-{id:"p31",lat:41.8860,lng:12.5450,code:"Li"},{id:"p32",lat:41.8863,lng:12.5430,code:"Ma"},
-{id:"p33",lat:41.8861,lng:12.5460,code:"Vi"},{id:"p34",lat:41.8865,lng:12.5420,code:"Pg"},
-{id:"p35",lat:41.8858,lng:12.5443,code:"Gi"},{id:"p36",lat:41.8864,lng:12.5454,code:"Mc"},
-{id:"p37",lat:41.8877,lng:12.5418,code:"Lo"},{id:"p38",lat:41.8869,lng:12.5428,code:"Ar"},
-{id:"p39",lat:41.8863,lng:12.5467,code:"Sd"},{id:"p40",lat:41.8884,lng:12.5436,code:"Ai"},
-].map(t=>({...t,ts:"2025-03-01T09:00:00Z",prov:true,photo:null}));
 
 // ── STATE ────────────────────────────────────
 let map, addMode=false, pendingLL=null, editingId=null, selCode=null, pendingPhoto=null;
@@ -533,25 +511,6 @@ map.on("click",e=>{if(!addMode)return;pendingPhoto=null;openSpModal("+ Aggiungi 
 // Step 1: one-time fetch to check if collection is truly empty
 // This avoids the race condition where onSnapshot fires empty before data arrives
 async function startApp(){
-  try{
-    setSync("","Connessione...");
-    const check = await getDocs(COL());
-    if(check.empty){
-      // Genuine first install: write initial trees
-      setSync("","Prima configurazione...");
-      $("load-msg").textContent="Caricamento dati iniziali...";
-      const batch=writeBatch(db);
-      INIT.forEach(({id,...data})=>batch.set(DOC(id),data));
-      await batch.commit();
-    }
-  }catch(e){
-    setSync("err","Errore connessione: "+e.code);
-    $("load-msg").textContent="Errore: "+e.code;
-    hideLoader();
-    return;
-  }
-
-  // Step 2: start realtime listener (only AFTER confirmed initial check)
   onSnapshot(COL(), snapshot=>{
     snapshot.docChanges().forEach(change=>{
       const id=change.doc.id,t=change.doc.data();
